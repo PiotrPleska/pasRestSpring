@@ -107,7 +107,7 @@ public class RentRepository extends AbstractMongoRepository {
 
             Document rentDocument = rentToDocument(rent);
 
-            Bson filter = Filters.eq("_id", new ObjectId("656065b1514b5a6cac6e8575"));
+            Bson filter = Filters.eq("_id", new ObjectId("6564dac3d384808aa3262c83"));
             Bson update = Updates.push("activeRents", rentDocument);
 
             activeRentsCollection.updateOne(filter, update);
@@ -139,7 +139,7 @@ public class RentRepository extends AbstractMongoRepository {
 //                    throw new ResourceNotFoundException("Could not find rent with roomNumber: " + roomNumber);
 //                }
 
-                Bson filter = Filters.eq("_id", new ObjectId("656065b1514b5a6cac6e8575"));
+                Bson filter = Filters.eq("_id", new ObjectId("6564dac3d384808aa3262c83"));
                 Bson update = Updates.pull("activeRents", rentDocument);
 
                 activeRentsCollection.updateOne(filter, update);

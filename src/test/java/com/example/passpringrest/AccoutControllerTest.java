@@ -27,7 +27,7 @@ public class AccoutControllerTest {
 
     private static AccountRepository accountRepository;
 
-    private final String baseUrl = "http://localhost:8080/pasSpringRest-0.0.1-SNAPSHOT/api/accounts/";
+    private final String baseUrl = "/api/accounts";
 
     @BeforeEach
     public void clearData() {
@@ -59,7 +59,7 @@ public class AccoutControllerTest {
     public void readAdminAccountsTest() {
         given()
                 .when()
-                .get(baseUrl + "admins")
+                .get(baseUrl + "/admins")
                 .then()
                 .statusCode(200)
                 .body(
@@ -73,7 +73,7 @@ public class AccoutControllerTest {
     public void readResourceManagerAccountsTest() {
         given()
                 .when()
-                .get(baseUrl + "resource-managers")
+                .get(baseUrl + "/resource-managers")
                 .then()
                 .statusCode(200)
                 .body(
@@ -87,7 +87,7 @@ public class AccoutControllerTest {
     public void readClientAccountsTest() {
         given()
                 .when()
-                .get(baseUrl + "clients")
+                .get(baseUrl + "/clients")
                 .then()
                 .statusCode(200)
                 .body(
@@ -101,7 +101,7 @@ public class AccoutControllerTest {
     public void readAccountByIdTest() {
         given()
                 .when()
-                .get(baseUrl + clientAccount.getId())
+                .get(baseUrl + "/" + clientAccount.getId())
                 .then()
                 .statusCode(200)
                 .body(
@@ -113,7 +113,7 @@ public class AccoutControllerTest {
     public void readAccountByInvalidIdTest() {
         given()
                 .when()
-                .get(baseUrl + "123")
+                .get(baseUrl + "/" + "123")
                 .then()
                 .statusCode(404);
     }
@@ -122,7 +122,7 @@ public class AccoutControllerTest {
     public void readAccountByPersonalIdTest() {
         given()
                 .when()
-                .get(baseUrl + "personal-id/" + clientAccount.getPersonalId())
+                .get(baseUrl + "/personal-id/" + clientAccount.getPersonalId())
                 .then()
                 .statusCode(200)
                 .body(
@@ -134,7 +134,7 @@ public class AccoutControllerTest {
     public void readAccountByInvalidPersonalIdTest() {
         given()
                 .when()
-                .get(baseUrl + "personal-id/" + "1234567890")
+                .get(baseUrl + "/personal-id/" + "1234567890")
                 .then()
                 .statusCode(404);
     }
@@ -143,7 +143,7 @@ public class AccoutControllerTest {
     public void readAccountByLoginTest() {
         given()
                 .when()
-                .get(baseUrl + "login/" + clientAccount.getLogin())
+                .get(baseUrl + "/login/" + clientAccount.getLogin())
                 .then()
                 .statusCode(200)
                 .body(
@@ -155,7 +155,7 @@ public class AccoutControllerTest {
     public void readAccountByInvalidLoginTest() {
         given()
                 .when()
-                .get(baseUrl + "login/" + "123")
+                .get(baseUrl + "/login/" + "123")
                 .then()
                 .statusCode(404);
     }
@@ -164,7 +164,7 @@ public class AccoutControllerTest {
     public void readAccountsByPartOfLoginTest() {
         given()
                 .when()
-                .get(baseUrl + "part-of-login/" + "korwin")
+                .get(baseUrl + "/part-of-login/" + "korwin")
                 .then()
                 .statusCode(200)
                 .body(
@@ -176,7 +176,7 @@ public class AccoutControllerTest {
     public void readAccountsByInvalidPartOfLoginTest() {
         given()
                 .when()
-                .get(baseUrl + "part-of-login/" + "####")
+                .get(baseUrl + "/part-of-login/" + "####")
                 .then()
                 .statusCode(404);
     }
@@ -192,7 +192,7 @@ public class AccoutControllerTest {
                 .contentType("application/json")
                 .body(json.toString())
                 .when()
-                .put(baseUrl + "password/" + clientAccount.getLogin())
+                .put(baseUrl + "/password/" + clientAccount.getLogin())
                 .then().statusCode(200);
 
 // I am not testing if password has changed because I don't have access to it
@@ -209,7 +209,7 @@ public class AccoutControllerTest {
                 .contentType("application/json")
                 .body(json.toString())
                 .when()
-                .put(baseUrl + "password/" + "123")
+                .put(baseUrl + "/password/" + "123")
                 .then().statusCode(404);
     }
 
@@ -219,12 +219,12 @@ public class AccoutControllerTest {
         given()
                 .contentType("application/json")
                 .when()
-                .patch(baseUrl + "deactivate/" + clientAccount.getLogin())
+                .patch(baseUrl + "/deactivate/" + clientAccount.getLogin())
                 .then().statusCode(200);
 
         given()
                 .when()
-                .get(baseUrl + clientAccount.getId())
+                .get(baseUrl + "/" + clientAccount.getId())
                 .then()
                 .statusCode(200)
                 .body(
@@ -234,12 +234,12 @@ public class AccoutControllerTest {
         given()
                 .contentType("application/json")
                 .when()
-                .patch(baseUrl + "activate/" + clientAccount.getLogin())
+                .patch(baseUrl + "/activate/" + clientAccount.getLogin())
                 .then().statusCode(200);
 
         given()
                 .when()
-                .get(baseUrl + clientAccount.getId())
+                .get(baseUrl + "/" + clientAccount.getId())
                 .then()
                 .statusCode(200)
                 .body(
@@ -252,7 +252,7 @@ public class AccoutControllerTest {
         given()
                 .contentType("application/json")
                 .when()
-                .patch(baseUrl + "activate/" + "123")
+                .patch(baseUrl + "/activate/" + "123")
                 .then().statusCode(404);
     }
 
@@ -260,7 +260,7 @@ public class AccoutControllerTest {
     public void deactivateAccountTest() {
         given()
                 .when()
-                .get(baseUrl + clientAccount.getId())
+                .get(baseUrl + "/" + clientAccount.getId())
                 .then()
                 .statusCode(200)
                 .body(
@@ -270,12 +270,12 @@ public class AccoutControllerTest {
         given()
                 .contentType("application/json")
                 .when()
-                .patch(baseUrl + "deactivate/" + clientAccount.getLogin())
+                .patch(baseUrl + "/deactivate/" + clientAccount.getLogin())
                 .then().statusCode(200);
 
         given()
                 .when()
-                .get(baseUrl + clientAccount.getId())
+                .get(baseUrl + "/" + clientAccount.getId())
                 .then()
                 .statusCode(200)
                 .body(
@@ -288,20 +288,21 @@ public class AccoutControllerTest {
         given()
                 .contentType("application/json")
                 .when()
-                .patch(baseUrl + "deactivate/" + "123")
+                .patch(baseUrl + "/deactivate/" + "123")
                 .then().statusCode(404);
     }
 
     @Test
     public void createClientAccountTest() throws JSONException {
         JSONObject json = new JSONObject();
+        json.put("id", new MongoUUID(UUID.randomUUID()));
         json.put("login", "nowyLogin");
         json.put("password", "noweHaslo123");
         json.put("personalId", "45032103676");
 
         given()
                 .when()
-                .get(baseUrl + "login/" + "nowyLogin")
+                .get(baseUrl + "/login/" + "nowyLogin")
                 .then()
                 .statusCode(404);
 
@@ -309,12 +310,12 @@ public class AccoutControllerTest {
                 .contentType("application/json")
                 .body(json.toString())
                 .when()
-                .post(baseUrl + "client/add")
+                .post(baseUrl + "/client")
                 .then().statusCode(200);
 
         given()
                 .when()
-                .get(baseUrl + "login/" + "nowyLogin")
+                .get(baseUrl + "/login/" + "nowyLogin")
                 .then()
                 .statusCode(200)
                 .body(
@@ -334,13 +335,14 @@ public class AccoutControllerTest {
                 .contentType("application/json")
                 .body(json.toString())
                 .when()
-                .post(baseUrl + "client/add")
+                .post(baseUrl + "/client")
                 .then().statusCode(409);
     }
 
     @Test
     public void createClientAccountWithAlreadyExistingPersonalId() throws JSONException {
         JSONObject json = new JSONObject();
+        json.put("id", new MongoUUID(UUID.randomUUID()));
         json.put("login", "nowyLogin");
         json.put("password", "noweHaslo123");
         json.put("personalId", clientAccount.getPersonalId());
@@ -349,20 +351,21 @@ public class AccoutControllerTest {
                 .contentType("application/json")
                 .body(json.toString())
                 .when()
-                .post(baseUrl + "client/add")
+                .post(baseUrl + "/client")
                 .then().statusCode(409);
     }
 
     @Test
     public void createAdminAccountTest() throws JSONException {
         JSONObject json = new JSONObject();
+        json.put("id", new MongoUUID(UUID.randomUUID()));
         json.put("login", "nowyLogin2");
         json.put("password", "noweHaslo123");
         json.put("personalId", "45032103677");
 
         given()
                 .when()
-                .get(baseUrl + "login/" + "nowyLogin2")
+                .get(baseUrl + "/login/" + "nowyLogin2")
                 .then()
                 .statusCode(404);
 
@@ -370,12 +373,12 @@ public class AccoutControllerTest {
                 .contentType("application/json")
                 .body(json.toString())
                 .when()
-                .post(baseUrl + "admin/add")
+                .post(baseUrl + "/admin")
                 .then().statusCode(200);
 
         given()
                 .when()
-                .get(baseUrl + "login/" + "nowyLogin2")
+                .get(baseUrl + "/login/" + "nowyLogin2")
                 .then()
                 .statusCode(200)
                 .body(
@@ -387,6 +390,7 @@ public class AccoutControllerTest {
     @Test
     public void createAdminAccountWithAlreadyExistingLogin() throws JSONException {
         JSONObject json = new JSONObject();
+        json.put("id", new MongoUUID(UUID.randomUUID()));
         json.put("login", adminAccount.getLogin());
         json.put("password", "noweHaslo123");
         json.put("personalId", "45032103677");
@@ -395,13 +399,14 @@ public class AccoutControllerTest {
                 .contentType("application/json")
                 .body(json.toString())
                 .when()
-                .post(baseUrl + "admin/add")
+                .post(baseUrl + "/admin")
                 .then().statusCode(409);
     }
 
     @Test
     public void createAdminAccountWithAlreadyExistingPersonalId() throws JSONException {
         JSONObject json = new JSONObject();
+        json.put("id", new MongoUUID(UUID.randomUUID()));
         json.put("login", "nowyLogin2");
         json.put("password", "noweHaslo123");
         json.put("personalId", adminAccount.getPersonalId());
@@ -410,20 +415,21 @@ public class AccoutControllerTest {
                 .contentType("application/json")
                 .body(json.toString())
                 .when()
-                .post(baseUrl + "admin/add")
+                .post(baseUrl + "/admin")
                 .then().statusCode(409);
     }
 
     @Test
     public void createResourceManagerAccountTest() throws JSONException {
         JSONObject json = new JSONObject();
+        json.put("id", new MongoUUID(UUID.randomUUID()));
         json.put("login", "nowyLogin3");
         json.put("password", "noweHaslo123");
         json.put("personalId", "45032103678");
 
         given()
                 .when()
-                .get(baseUrl + "login/" + "nowyLogin3")
+                .get(baseUrl + "/login/" + "nowyLogin3")
                 .then()
                 .statusCode(404);
 
@@ -431,12 +437,12 @@ public class AccoutControllerTest {
                 .contentType("application/json")
                 .body(json.toString())
                 .when()
-                .post(baseUrl + "resource-manager/add")
+                .post(baseUrl + "/resource-manager")
                 .then().statusCode(200);
 
         given()
                 .when()
-                .get(baseUrl + "login/" + "nowyLogin3")
+                .get(baseUrl + "/login/" + "nowyLogin3")
                 .then()
                 .statusCode(200)
                 .body(
@@ -448,6 +454,7 @@ public class AccoutControllerTest {
     @Test
     public void createResourceManagerAccountWithAlreadyExistingLogin() throws JSONException {
         JSONObject json = new JSONObject();
+        json.put("id", new MongoUUID(UUID.randomUUID()));
         json.put("login", resourceManagerAccount.getLogin());
         json.put("password", "noweHaslo123");
         json.put("personalId", "45032103678");
@@ -456,7 +463,7 @@ public class AccoutControllerTest {
                 .contentType("application/json")
                 .body(json.toString())
                 .when()
-                .post(baseUrl + "resource-manager/add")
+                .post(baseUrl + "/resource-manager")
                 .then().statusCode(409);
     }
 
@@ -466,6 +473,7 @@ public class AccoutControllerTest {
     @Test
     public void createAccountWithInvalidDataTest() throws JSONException {
         JSONObject json = new JSONObject();
+        json.put("id", new MongoUUID(UUID.randomUUID()));
         json.put("login", "nowy");
         json.put("password", "nowe");
         json.put("personalId", "1234567890");
@@ -474,7 +482,7 @@ public class AccoutControllerTest {
                 .contentType("application/json")
                 .body(json.toString())
                 .when()
-                .post(baseUrl + "client/add")
+                .post(baseUrl + "/client")
                 .then().statusCode(400);
     }
 

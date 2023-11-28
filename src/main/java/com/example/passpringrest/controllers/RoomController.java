@@ -6,9 +6,12 @@ import com.example.passpringrest.exceptions.ResourceOccupiedException;
 import com.example.passpringrest.services.RoomService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 
 @RestController
@@ -21,86 +24,83 @@ public class RoomController {
 
 
     @GetMapping(produces = "application/json")
-    public Response getRooms() {
+    public List<RoomDto> getRooms() {
         try {
-            return Response.ok(roomService.readAllRooms()).build();
+            return roomService.readAllRooms();
         } catch (ResourceNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
     @GetMapping(value = "/{id}", produces = "application/json")
-    public Response getRoomById(@PathVariable @NotNull String id) {
+    public RoomDto getRoomById(@PathVariable @NotNull String id) {
         try {
-            return Response.ok(roomService.readRoomById(id)).build();
+            return roomService.readRoomById(id);
         } catch (ResourceNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
     @GetMapping(value = "/room-number/{roomNumber}", produces = "application/json")
-    public Response getRoomByRoomNumber(@PathVariable("roomNumber") @NotNull int roomNumber) {
+    public RoomDto getRoomByRoomNumber(@PathVariable("roomNumber") @NotNull int roomNumber) {
         try {
-            return Response.ok(roomService.readRoomByRoomNumber(roomNumber)).build();
+            return roomService.readRoomByRoomNumber(roomNumber);
         } catch (ResourceNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
-    @PutMapping(value = "/price/{roomNumber}", produces = "application/json")
-    public Response updateRoomPrice(@PathVariable("roomNumber") @NotNull int roomNumber, @Valid @NotNull RoomDto roomDto) {
+    @PutMapping(value = "/price/{roomNumber}", consumes = "application/json", produces = "application/json")
+    public void updateRoomPrice(@PathVariable("roomNumber") int roomNumber,@RequestBody @Valid @NotNull RoomDto roomDto) {
         try {
             roomService.updateRoomPrice(roomNumber, roomDto.getBasePrice());
-            return Response.ok().build();
         } catch (ResourceNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
     @PutMapping(value = "/capacity/{roomNumber}", produces = "application/json")
-    public Response updateRoomCapacity(@PathVariable("roomNumber") @NotNull int roomNumber, @Valid @NotNull RoomDto roomDto) {
+    public void updateRoomCapacity(@PathVariable("roomNumber") @NotNull int roomNumber,@RequestBody @Valid @NotNull RoomDto roomDto) {
         try {
             roomService.updateRoomCapacity(roomNumber, roomDto.getRoomCapacity());
-            return Response.ok().build();
         } catch (ResourceNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
     @DeleteMapping(value = "/{roomNumber}", produces = "application/json")
-    public Response deleteRoom(@PathVariable("roomNumber") @NotNull int roomNumber) {
+    public void deleteRoom(@PathVariable("roomNumber") @NotNull int roomNumber) {
         try {
             roomService.deleteRoom(roomNumber);
-            return Response.ok().build();
         } catch (ResourceNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (ResourceOccupiedException e) {
-            return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
 
     }
 
-    @PostMapping(value = "/add",produces = "application/json")
-    public Response addRoom(@Valid @NotNull RoomDto roomDto) {
+
+    @PostMapping(consumes = "application/json", produces = "application/json")
+    public void addRoom(@RequestBody @Valid @NotNull RoomDto roomDto) {
         try {
             roomService.createRoom(roomDto);
-            return Response.ok().build();
         } catch (ResourceOccupiedException e) {
-            return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 

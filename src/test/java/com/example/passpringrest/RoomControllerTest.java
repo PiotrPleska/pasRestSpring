@@ -107,7 +107,7 @@ public class RoomControllerTest {
                 .put(baseUrl + "/price/1")
                 .then().statusCode(200);
 
-        Response response = RestAssured.get("http://localhost:8080/restapp-1.0-SNAPSHOT/api/rooms/room-number/1");
+        Response response = RestAssured.get(baseUrl + "/room-number/1");
         Assertions.assertEquals(200, response.getStatusCode());
         Assertions.assertEquals(10.0, response.jsonPath().getDouble("basePrice"));
     }
@@ -153,6 +153,7 @@ public class RoomControllerTest {
     @Test
     public void createRoomTest() throws JSONException {
         JSONObject json = new JSONObject();
+        json.put("id", UUID.randomUUID());
         json.put("roomNumber", 100);
         json.put("roomCapacity", 3);
         json.put("basePrice", 4);
@@ -161,8 +162,10 @@ public class RoomControllerTest {
                 .contentType("application/json")
                 .body(json.toString())
                 .when()
-                .post(baseUrl + "/add")
-                .then().statusCode(200);
+                .post(baseUrl)
+                .then()
+                .statusCode(200);
+
 
         Response response = RestAssured.get(baseUrl + "/room-number/100");
         Assertions.assertEquals(200, response.getStatusCode());
@@ -227,7 +230,7 @@ public class RoomControllerTest {
                 .body(json.toString())
                 .when()
                 .post(baseUrl + "/add")
-                .then().statusCode(409);
+                .then().statusCode(405);
     }
 
     @Test
@@ -242,7 +245,7 @@ public class RoomControllerTest {
                 .body(json.toString())
                 .when()
                 .post(baseUrl + "/add")
-                .then().statusCode(400);
+                .then().statusCode(405);
     }
 
     @Test

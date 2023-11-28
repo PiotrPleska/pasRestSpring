@@ -14,7 +14,7 @@ import com.example.passpringrest.exceptions.ResourceNotFoundException;
 import com.example.passpringrest.exceptions.ResourceOccupiedException;
 import com.example.passpringrest.repositories.AccountRepository;
 import lombok.RequiredArgsConstructor;
-import org.jvnet.hk2.annotations.Service;
+import org.springframework.stereotype.Service;
 
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AccountService {
 
-    private AccountRepository accoutRepository;
+    private final AccountRepository accoutRepository;
 
     public List<AbstractAccountDto> readAllAccounts() {
         List<AbstractAccount> accounts = accoutRepository.readAllAccounts();

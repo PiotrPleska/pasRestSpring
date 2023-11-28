@@ -29,7 +29,7 @@ public class RentControllerTest {
 
     private static AccountRepository accountRepository;
 
-    private final String baseUrl = "http://localhost:8080/pasSpringRest-0.0.1-SNAPSHOT/api/rents/";
+    private final String baseUrl = "/api/rents";
 
     @BeforeEach
     public void clearData() {
@@ -88,7 +88,7 @@ public class RentControllerTest {
     public void readRentByIdTest() {
         given()
                 .when()
-                .get(baseUrl + rent.getRentId().getUuid().toString())
+                .get(baseUrl + "/" + rent.getRentId().getUuid().toString())
                 .then()
                 .statusCode(200)
                 .body(
@@ -100,7 +100,7 @@ public class RentControllerTest {
     public void readRentByIdWhenNotFoundTest() {
         given()
                 .when()
-                .get(baseUrl + UUID.randomUUID())
+                .get(baseUrl + "/" + UUID.randomUUID())
                 .then()
                 .statusCode(404);
     }
@@ -110,7 +110,7 @@ public class RentControllerTest {
     public void readCurrentRentsTest() {
         given()
                 .when()
-                .get(baseUrl + "current")
+                .get(baseUrl + "/" + "current")
                 .then()
                 .statusCode(200)
                 .body(
@@ -124,7 +124,7 @@ public class RentControllerTest {
         rentRepository.dropRentCollection();
         given()
                 .when()
-                .get(baseUrl + "current")
+                .get(baseUrl + "/" + "current")
                 .then()
                 .statusCode(404);
     }
@@ -133,7 +133,7 @@ public class RentControllerTest {
     public void readPastRentsTest() {
         given()
                 .when()
-                .get(baseUrl + "past")
+                .get(baseUrl + "/" + "past")
                 .then()
                 .statusCode(200)
                 .body(
@@ -147,7 +147,7 @@ public class RentControllerTest {
         rentRepository.dropRentCollection();
         given()
                 .when()
-                .get(baseUrl + "past")
+                .get(baseUrl + "/" + "past")
                 .then()
                 .statusCode(404);
     }
@@ -156,7 +156,7 @@ public class RentControllerTest {
     public void readCurrentRentsByRoomIdTest() {
         given()
                 .when()
-                .get(baseUrl + "current/room-id/" + rent.getRoom().getId().getUuid().toString())
+                .get(baseUrl + "/" + "current/room-id/" + rent.getRoom().getId().getUuid().toString())
                 .then()
                 .statusCode(200)
                 .body(
@@ -169,7 +169,7 @@ public class RentControllerTest {
     public void readCurrentRentsByRoomIdWithWrongIdTest() {
         given()
                 .when()
-                .get(baseUrl + "current/room-id/" + UUID.randomUUID())
+                .get(baseUrl + "/" + "current/room-id/" + UUID.randomUUID())
                 .then()
                 .statusCode(404);
     }
@@ -178,7 +178,7 @@ public class RentControllerTest {
     public void readPastRentsByRoomIdTest() {
         given()
                 .when()
-                .get(baseUrl + "past/room-id/" + rentFinished.getRoom().getId().getUuid().toString())
+                .get(baseUrl + "/" + "past/room-id/" + rentFinished.getRoom().getId().getUuid().toString())
                 .then()
                 .statusCode(200)
                 .body(
@@ -191,7 +191,7 @@ public class RentControllerTest {
     public void readPastRentsByRoomIdWithWrongIdTest() {
         given()
                 .when()
-                .get(baseUrl + "past/room-id/" + UUID.randomUUID())
+                .get(baseUrl + "/" + "past/room-id/" + UUID.randomUUID())
                 .then()
                 .statusCode(404);
     }
@@ -200,7 +200,7 @@ public class RentControllerTest {
     public void readCurrentRentsByClientIdTest() {
         given()
                 .when()
-                .get(baseUrl + "current/account-id/" + rent.getClientAccount().getId().getUuid().toString())
+                .get(baseUrl + "/" + "current/account-id/" + rent.getClientAccount().getId().getUuid().toString())
                 .then()
                 .statusCode(200)
                 .body(
@@ -213,7 +213,7 @@ public class RentControllerTest {
     public void readCurrentRentsByClientIdWithWrongIdTest() {
         given()
                 .when()
-                .get(baseUrl + "current/account-id/" + UUID.randomUUID())
+                .get(baseUrl + "/" + "current/account-id/" + UUID.randomUUID())
                 .then()
                 .statusCode(404);
     }
@@ -222,7 +222,7 @@ public class RentControllerTest {
     public void readPastRentsByClientIdTest() {
         given()
                 .when()
-                .get(baseUrl + "past/account-id/" + rentFinished.getClientAccount().getId().getUuid().toString())
+                .get(baseUrl + "/" + "past/account-id/" + rentFinished.getClientAccount().getId().getUuid().toString())
                 .then()
                 .statusCode(200)
                 .body(
@@ -235,7 +235,7 @@ public class RentControllerTest {
     public void readPastRentsByClientIdWithWrongIdTest() {
         given()
                 .when()
-                .get(baseUrl + "past/account-id/" + UUID.randomUUID())
+                .get(baseUrl + "/" + "past/account-id/" + UUID.randomUUID())
                 .then()
                 .statusCode(404);
     }
@@ -245,7 +245,7 @@ public class RentControllerTest {
 
         given()
                 .when()
-                .get(baseUrl + rent.getRentId().getUuid().toString())
+                .get(baseUrl + "/" + rent.getRentId().getUuid().toString())
                 .then()
                 .statusCode(200)
                 .body(
@@ -254,13 +254,13 @@ public class RentControllerTest {
 
         given()
                 .when()
-                .delete(baseUrl + rent.getRentId().getUuid().toString())
+                .delete(baseUrl + "/" + rent.getRentId().getUuid().toString())
                 .then()
                 .statusCode(200);
 
         given()
                 .when()
-                .get(baseUrl + rent.getRentId().getUuid().toString())
+                .get(baseUrl + "/" + rent.getRentId().getUuid().toString())
                 .then()
                 .statusCode(200)
                 .body(
@@ -272,7 +272,7 @@ public class RentControllerTest {
     public void deleteFinishedRentTest() {
         given()
                 .when()
-                .delete(baseUrl + rentFinished.getRentId().getUuid().toString())
+                .delete(baseUrl + "/" + rentFinished.getRentId().getUuid().toString())
                 .then()
                 .statusCode(409);
 
@@ -291,7 +291,7 @@ public class RentControllerTest {
     public void deleteRentWhenNotFoundTest() {
         given()
                 .when()
-                .delete(baseUrl + UUID.randomUUID())
+                .delete(baseUrl + "/" + UUID.randomUUID())
                 .then()
                 .statusCode(404);
     }

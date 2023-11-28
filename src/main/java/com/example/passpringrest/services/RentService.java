@@ -14,7 +14,7 @@ import com.example.passpringrest.repositories.AccountRepository;
 import com.example.passpringrest.repositories.RentRepository;
 import com.example.passpringrest.repositories.RoomRepository;
 import lombok.RequiredArgsConstructor;
-import org.jvnet.hk2.annotations.Service;
+import org.springframework.stereotype.Service;
 
 
 import java.util.ArrayList;
@@ -26,13 +26,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RentService {
 
-    private RentRepository rentRepository;
+    private final RentRepository rentRepository;
 
 
-    private RoomRepository roomRepository;
+    private final RoomRepository roomRepository;
 
 
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
 
     public List<RentDtoGet> readAllRents() throws ResourceNotFoundException {
         try {
