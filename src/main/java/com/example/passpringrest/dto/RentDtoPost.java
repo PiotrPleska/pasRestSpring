@@ -1,11 +1,15 @@
 package com.example.passpringrest.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.GregorianCalendar;
 
 public class RentDtoPost {
+
+    @JsonFormat
+            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private GregorianCalendar rentStartDate;
     private String accountId;
     private String roomId;

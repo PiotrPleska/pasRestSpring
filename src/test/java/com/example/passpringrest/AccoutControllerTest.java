@@ -27,7 +27,7 @@ public class AccoutControllerTest {
 
     private static AccountRepository accountRepository;
 
-    private final String baseUrl = "/api/accounts";
+    private final String baseUrl = "http://localhost:8080/api/accounts";
 
     @BeforeEach
     public void clearData() {
@@ -311,7 +311,7 @@ public class AccoutControllerTest {
                 .body(json.toString())
                 .when()
                 .post(baseUrl + "/client")
-                .then().statusCode(200);
+                .then().statusCode(201);
 
         given()
                 .when()
@@ -374,7 +374,7 @@ public class AccoutControllerTest {
                 .body(json.toString())
                 .when()
                 .post(baseUrl + "/admin")
-                .then().statusCode(200);
+                .then().statusCode(201);
 
         given()
                 .when()
@@ -438,7 +438,7 @@ public class AccoutControllerTest {
                 .body(json.toString())
                 .when()
                 .post(baseUrl + "/resource-manager")
-                .then().statusCode(200);
+                .then().statusCode(201);
 
         given()
                 .when()

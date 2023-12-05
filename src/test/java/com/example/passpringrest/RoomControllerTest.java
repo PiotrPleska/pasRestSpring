@@ -23,7 +23,7 @@ public class RoomControllerTest {
     private static Room room;
     private static RoomRepository roomRepository;
 
-    private static final String baseUrl = "/api/rooms";
+    private static final String baseUrl = "http://localhost:8080/api/rooms";
 
     @BeforeEach
     public void clearData() {

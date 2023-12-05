@@ -6,13 +6,13 @@ import com.example.passpringrest.dto.AdminAccountDto;
 import com.example.passpringrest.dto.ClientAccountDto;
 import com.example.passpringrest.dto.ResourceManagerAccountDto;
 import com.example.passpringrest.exceptions.ResourceNotFoundException;
-import com.example.passpringrest.exceptions.ResourceOccupiedException;
 import com.example.passpringrest.services.AccountService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -27,166 +27,80 @@ public class AccountController {
 
 
     @GetMapping(produces = "application/json")
-    public List<AbstractAccountDto> getAccounts() {
-        try {
-            return accountService.readAllAccounts();
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+    public ResponseEntity<List<AbstractAccountDto>>  getAccounts() {
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.readAllAccounts());
     }
 
     @GetMapping(value = "/admins", produces = "application/json")
-    public List<AbstractAccountDto> getAdminAccounts() {
-        try {
-            return accountService.readAdminAccounts();
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+    public ResponseEntity<List<AbstractAccountDto>>  getAdminAccounts() {
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.readAdminAccounts());
     }
 
     @GetMapping(value = "/resource-managers", produces = "application/json")
-    public List<AbstractAccountDto> getResourceManagerAccounts() {
-        try {
-
-            return accountService.readResourceManagerAccounts();
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+    public ResponseEntity<List<AbstractAccountDto>>  getResourceManagerAccounts() {
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.readResourceManagerAccounts());
     }
 
     @GetMapping(value = "/clients", produces = "application/json")
-    public List<AbstractAccountDto> getClientAccounts() {
-        try {
-            return accountService.readClientAccounts();
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+    public ResponseEntity<List<AbstractAccountDto>> getClientAccounts() {
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.readClientAccounts());
     }
 
 
     @GetMapping(value = "/{id}", produces = "application/json")
-    public AbstractAccountDto getAccountById(@PathVariable("id") @NotNull String id) {
-        try {
-            return accountService.readAccountById(id);
-        } catch (ResourceNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+    public ResponseEntity<AbstractAccountDto> getAccountById(@PathVariable("id") @NotNull String id) {
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.readAccountById(id));
     }
 
 
     @GetMapping(value = "/personal-id/{personalId}", produces = "application/json")
-    public AbstractAccountDto getAccountByPersonalId(@PathVariable("personalId") @NotNull String personalId) {
-        try {
-            return accountService.readAccountByPersonalId(personalId);
-        } catch (ResourceNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+    public ResponseEntity<AbstractAccountDto> getAccountByPersonalId(@PathVariable("personalId") @NotNull String personalId) {
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.readAccountByPersonalId(personalId));
     }
 
     @GetMapping(value = "/login/{login}", produces = "application/json")
-    public AbstractAccountDto getAccountByLogin(@PathVariable("login") @NotNull String login) {
-        try {
-            return accountService.readAccountByLogin(login);
-        } catch (ResourceNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+    public ResponseEntity<AbstractAccountDto> getAccountByLogin(@PathVariable("login") @NotNull String login) {
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.readAccountByLogin(login));
     }
 
     @GetMapping(value = "/part-of-login/{partOfLogin}", produces = "application/json")
-    public List<AbstractAccountDto> getAccountsByPartOfLogin(@PathVariable("partOfLogin") @NotNull String partOfLogin) {
-        try {
-            return accountService.readAccountsByPartOfLogin(partOfLogin);
-        } catch (ResourceNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+    public ResponseEntity<List<AbstractAccountDto>> getAccountsByPartOfLogin(@PathVariable("partOfLogin") @NotNull String partOfLogin) {
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.readAccountsByPartOfLogin(partOfLogin));
     }
 
 
     @PutMapping(value = "/password/{login}", produces = "application/json")
-    public void updateAccountPasswordByLogin(@PathVariable("login") @NotNull String login,@RequestBody @Valid @NotNull ClientAccountDto acc) {
-        try {
-            accountService.updateAccountPasswordByLogin(login, acc);
-        } catch (ResourceNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+    public ResponseEntity<AbstractAccountDto> updateAccountPasswordByLogin(@PathVariable("login") @NotNull String login,
+                                                                           @RequestBody @Valid @NotNull ClientAccountDto acc) {
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.updateAccountPasswordByLogin(login, acc));
     }
 
 
     @PatchMapping(value = "/activate/{login}", produces = "application/json")
     public void activateAccountByLogin(@PathVariable("login") @NotNull String login) {
-        try {
-            accountService.updateAccountActiveByLogin(login, true);
-        } catch (ResourceNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        accountService.updateAccountActiveByLogin(login, true);
     }
 
     @PatchMapping(value = "/deactivate/{login}", produces = "application/json")
     public void deactivateAccountByLogin(@PathVariable("login") @NotNull String login) {
-        try {
-            accountService.updateAccountActiveByLogin(login, false);
-        } catch (ResourceNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        accountService.updateAccountActiveByLogin(login, false);
     }
 
 
     @PostMapping(value = "/client", produces = "application/json", consumes = "application/json")
-    public void addClientAccount(@RequestBody @Valid @NotNull ClientAccountDto clientAccountDto) {
-        try {
-            accountService.createClientAccount(clientAccountDto);
-        } catch (ResourceOccupiedException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+    public ResponseEntity<ClientAccountDto> addClientAccount(@RequestBody @Valid @NotNull ClientAccountDto clientAccountDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createClientAccount(clientAccountDto));
     }
 
 
     @PostMapping(value = "/admin", produces = "application/json", consumes = "application/json")
-    public void addAdminAccount(@RequestBody @Valid @NotNull AdminAccountDto adminAccountDto) {
-        try {
-            accountService.createAdminAccount(adminAccountDto);
-        } catch (ResourceOccupiedException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+    public ResponseEntity<AdminAccountDto> addAdminAccount(@RequestBody @Valid @NotNull AdminAccountDto adminAccountDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAdminAccount(adminAccountDto));
     }
 
 
     @PostMapping(value = "/resource-manager", produces = "application/json", consumes = "application/json")
-    public void addResourceManagerAccount(@RequestBody @Valid @NotNull ResourceManagerAccountDto resourceManagerAccountDto) {
-        try {
-            accountService.createResourceManagerAccount(resourceManagerAccountDto);
-        } catch (ResourceOccupiedException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+    public ResponseEntity<ResourceManagerAccountDto> addResourceManagerAccount(@RequestBody @Valid @NotNull ResourceManagerAccountDto resourceManagerAccountDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createResourceManagerAccount(resourceManagerAccountDto));
     }
 }

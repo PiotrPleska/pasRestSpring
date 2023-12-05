@@ -2,6 +2,7 @@ package com.example.passpringrest.dto;
 
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.GregorianCalendar;
@@ -13,9 +14,13 @@ public class RentDtoGet {
     private UUID rentId;
 
     @JsonProperty("rentStartDate")
+    @JsonFormat
+            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private GregorianCalendar rentStartDate;
 
     @JsonProperty("rentEndDate")
+    @JsonFormat
+            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private GregorianCalendar rentEndDate;
 
     @JsonProperty("account")
