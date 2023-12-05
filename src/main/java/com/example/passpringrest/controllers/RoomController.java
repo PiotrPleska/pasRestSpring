@@ -7,7 +7,9 @@ import com.example.passpringrest.services.RoomService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,8 +22,6 @@ import java.util.List;
 public class RoomController {
 
     private final RoomService roomService;
-
-
 
     @GetMapping(produces = "application/json")
     public List<RoomDto> getRooms() {
@@ -92,17 +92,9 @@ public class RoomController {
 
     }
 
-
     @PostMapping(consumes = "application/json", produces = "application/json")
-    public void addRoom(@RequestBody @Valid @NotNull RoomDto roomDto) {
-        try {
-            roomService.createRoom(roomDto);
-        } catch (ResourceOccupiedException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+    public ResponseEntity<RoomDto> addRoom(@RequestBody @Valid @NotNull RoomDto roomDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(roomService.createRoom(roomDto));
     }
-
 
 }

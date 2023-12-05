@@ -1,18 +1,18 @@
 package com.example.passpringrest.dto;
 
-import jakarta.json.bind.annotation.JsonbCreator;
-import jakarta.json.bind.annotation.JsonbProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.UUID;
+
 
 public class ResourceManagerAccountDto extends AbstractAccountDto {
 
     public ResourceManagerAccountDto() {
     }
 
-    @JsonbCreator
-    public ResourceManagerAccountDto(@JsonbProperty("login") String login, @JsonbProperty("password") String password,
-                                     @JsonbProperty("personalId") String personalId) {
+    @JsonCreator
+    public ResourceManagerAccountDto(@JsonProperty("login") String login, @JsonProperty("password") String password,
+                                     @JsonProperty("personalId") String personalId) {
         super(login, password, personalId);
     }
 

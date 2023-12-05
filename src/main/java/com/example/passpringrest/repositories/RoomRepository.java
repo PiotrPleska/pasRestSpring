@@ -9,7 +9,6 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Updates;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -19,7 +18,6 @@ import java.util.List;
 public class RoomRepository extends AbstractMongoRepository {
 
     private MongoCollection<Room> roomCollection;
-
 
     public RoomRepository() {
         this.roomCollection = initDbConnection().getCollection("rooms", Room.class);

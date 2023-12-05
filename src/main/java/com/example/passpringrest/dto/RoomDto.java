@@ -1,7 +1,7 @@
 package com.example.passpringrest.dto;
 
-import jakarta.json.bind.annotation.JsonbCreator;
-import jakarta.json.bind.annotation.JsonbProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -11,35 +11,35 @@ import java.util.UUID;
 
 public class RoomDto {
 
-    @JsonbProperty("id")
+    @JsonProperty("id")
     private UUID id;
 
     @NotNull
     @Positive
-    @JsonbProperty("roomNumber")
+    @JsonProperty("roomNumber")
     private int roomNumber;
 
     @NotNull
     @DecimalMin(value = "1", message = "Room capacity must be greater than 0")
     @DecimalMax(value = "5", message = "Room capacity must be less than 5")
-    @JsonbProperty("roomCapacity")
+    @JsonProperty("roomCapacity")
     private int roomCapacity;
 
     @NotNull
     @DecimalMin(value = "0.0", inclusive = false, message = "Base price must be greater than 0")
     @DecimalMax(value = "100000.0", inclusive = false, message = "Base price must be less than 100000")
-    @JsonbProperty("basePrice")
+    @JsonProperty("basePrice")
     private double basePrice;
 
-    @JsonbProperty("isRented")
+    @JsonProperty("isRented")
     private int isRented;
 
     public RoomDto() {
     }
 
-    @JsonbCreator
-    public RoomDto(@JsonbProperty("roomNumber") int roomNumber, @JsonbProperty("roomCapacity") int roomCapacity,
-                   @JsonbProperty("basePrice") double basePrice) {
+    @JsonCreator
+    public RoomDto(@JsonProperty("roomNumber") int roomNumber, @JsonProperty("roomCapacity") int roomCapacity,
+                   @JsonProperty("basePrice") double basePrice) {
         this.id = UUID.randomUUID();
         this.roomNumber = roomNumber;
         this.roomCapacity = roomCapacity;

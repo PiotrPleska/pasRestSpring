@@ -164,7 +164,7 @@ public class RoomControllerTest {
                 .when()
                 .post(baseUrl)
                 .then()
-                .statusCode(200);
+                .statusCode(201);
 
 
         Response response = RestAssured.get(baseUrl + "/room-number/100");

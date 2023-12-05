@@ -1,9 +1,7 @@
 package com.example.passpringrest.dto;
 
-
-
-import jakarta.json.bind.annotation.JsonbCreator;
-import jakarta.json.bind.annotation.JsonbProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.GregorianCalendar;
 
@@ -15,9 +13,9 @@ public class RentDtoPost {
     public RentDtoPost() {
     }
 
-    @JsonbCreator
-    public RentDtoPost(@JsonbProperty("rentStartDate") GregorianCalendar rentStartDate, @JsonbProperty("accountId") String accountId,
-                       @JsonbProperty("roomId") String roomId) {
+    @JsonCreator
+    public RentDtoPost(@JsonProperty("rentStartDate") GregorianCalendar rentStartDate, @JsonProperty("accountId") String accountId, @JsonProperty(
+            "roomId") String roomId) {
         this.rentStartDate = rentStartDate;
         this.accountId = accountId;
         this.roomId = roomId;

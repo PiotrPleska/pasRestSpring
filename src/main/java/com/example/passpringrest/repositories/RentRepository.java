@@ -17,7 +17,6 @@ import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Repository;
 
-
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -38,37 +37,16 @@ public class RentRepository extends AbstractMongoRepository {
         this.roomRepository = new RoomRepository();
     }
 
-    public void insertRent(Rent rent) throws IllegalStateException {
-        try (ClientSession clientSession = mongoClient.startSession()) {
-            try {
-                addRentToDocument(rent, clientSession); // if this does not error out, we can add rent to db
-//                MongoCollection<AbstractAccount> clientCollection =
-//                        db.getCollection("accounts", AbstractAccount.class).withWriteConcern(WriteConcern.MAJORITY);
-//                if (clientCollection.find(Filters.eq("personalId", rent.getClientAccount().getPersonalId())).first() == null) {
-//                    clientCollection.insertOne(rent.getClientAccount());
-//                }
-//
-//                MongoCollection<Room> roomCollection = db.getCollection("rooms", Room.class).withWriteConcern(WriteConcern.MAJORITY);
-//                if (roomCollection.find(Filters.eq("roomNumber", rent.getRoom().getRoomNumber())).first() == null) {
-//                    roomCollection.insertOne(rent.getRoom());
-//                }
+    public void insertRent(Rent rent) throws RentTransactionException, ResourceOccupiedException, ResourceNotFoundException {
+        ClientSession clientSession = mongoClient.startSession();
 
-                MongoCollection<Rent> rentCollection = db.getCollection("rents", Rent.class).withWriteConcern(WriteConcern.MAJORITY);
+        addRentToDocument(rent, clientSession); // if this does not error out, we can add rent to db
 
-//                List<Rent> rents = rentCollection.find().into(new ArrayList<>());
-//
-//                boolean roomAlreadyRented =
-//                        rents.stream().anyMatch(rent1 -> (rent1.getRoom().getRoomNumber() == rent.getRoom().getRoomNumber()) && (rent1.getRentEndDate() == null));
-//
-//                if (roomAlreadyRented) {
-//                    throw new IllegalStateException("Room is already rented");
-//                }
-                rentCollection.insertOne(rent);
-            } catch (Exception e) {
-                deleteRent(rent);
-                throw new RentTransactionException(e.getMessage());
-            }
-        }
+        MongoCollection<Rent> rentCollection = db.getCollection("rents", Rent.class).withWriteConcern(WriteConcern.MAJORITY);
+
+        rentCollection.insertOne(rent);
+
+        clientSession.close();
     }
 
     private Document rentToDocument(Rent rent) {
@@ -76,7 +54,8 @@ public class RentRepository extends AbstractMongoRepository {
     }
 
     // This method in created to have sure that we can add rent only if room is not rented
-    private void addRentToDocument(Rent rent, ClientSession clientSession) throws RentTransactionException, ResourceOccupiedException {
+    private void addRentToDocument(Rent rent, ClientSession clientSession) throws RentTransactionException, ResourceOccupiedException,
+            ResourceNotFoundException {
         try {
             MongoCollection<AbstractAccount> clientCollection =
                     db.getCollection("accounts", AbstractAccount.class).withWriteConcern(WriteConcern.MAJORITY);
@@ -107,13 +86,18 @@ public class RentRepository extends AbstractMongoRepository {
 
             Document rentDocument = rentToDocument(rent);
 
-            Bson filter = Filters.eq("_id", new ObjectId("6564dac3d384808aa3262c83"));
+            Bson filter = Filters.eq("_id", new ObjectId("6568d2f12fbe5b5967446526"));
             Bson update = Updates.push("activeRents", rentDocument);
 
             activeRentsCollection.updateOne(filter, update);
 
             clientSession.commitTransaction();
 
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (ResourceOccupiedException e) {
+            clientSession.abortTransaction();
+            throw e;
         } catch (Exception e) {
             clientSession.abortTransaction();
             throw new RentTransactionException(e.getMessage());
@@ -131,15 +115,10 @@ public class RentRepository extends AbstractMongoRepository {
                 clientSession.startTransaction();
 
                 List<Document> activeRents = activeRentsCollection.find().first().getList("activeRents", Document.class);
-                Document rentDocument = activeRents.stream().filter(activeRent -> activeRent.getInteger("roomNumber") == roomNumber).findFirst().orElse(null);
+                Document rentDocument =
+                        activeRents.stream().filter(activeRent -> activeRent.getInteger("roomNumber") == roomNumber).findFirst().orElse(null);
 
-
-//                if (rentDocument == null) {
-//                    System.err.println("Could not find rent with roomNumber: " + roomNumber);
-//                    throw new ResourceNotFoundException("Could not find rent with roomNumber: " + roomNumber);
-//                }
-
-                Bson filter = Filters.eq("_id", new ObjectId("6564dac3d384808aa3262c83"));
+                Bson filter = Filters.eq("_id", new ObjectId("6568d2f12fbe5b5967446526"));
                 Bson update = Updates.pull("activeRents", rentDocument);
 
                 activeRentsCollection.updateOne(filter, update);
@@ -155,7 +134,6 @@ public class RentRepository extends AbstractMongoRepository {
         }
     }
 
-    //TODO: Why we dont have end rent method with room number as parameter? Do we need to pass whole rent object to end rent?
     public void updateEndRentDateByRent(Rent rent) {
         Bson filter = Filters.eq("_id", rent.getRentId());
         Bson setUpdate = Updates.set("rentEndDate", rent.getRentEndDate());
@@ -331,11 +309,6 @@ public class RentRepository extends AbstractMongoRepository {
         }
     }
 
-//    public void deleteRent(MongoUUID id) {
-//        Bson filter = Filters.eq("_id", id);
-//        rentCollection.deleteOne(filter);
-//    }
-
     public void dropRentCollection() {
         rentCollection.drop();
         // Set active rents to empty array
@@ -343,8 +316,5 @@ public class RentRepository extends AbstractMongoRepository {
         Document updateDocument = new Document("$set", new Document("activeRents", new ArrayList<>()));
         activeRentsCollection.updateMany(new Document(), updateDocument);
     }
-
-//TODO utworzenie alokacji dla wskazanego Klienta oraz Zasobu (wskazanie poprzez wartość klucza), obwarowane co najmniej aktywnością Klienta oraz
-// dostępnością (brakiem nie zakończonych alokacji) Zasobu
 
 }

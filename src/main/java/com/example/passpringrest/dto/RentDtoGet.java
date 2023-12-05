@@ -1,26 +1,27 @@
 package com.example.passpringrest.dto;
 
-import jakarta.json.bind.annotation.JsonbCreator;
-import jakarta.json.bind.annotation.JsonbProperty;
+
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
 public class RentDtoGet {
 
-    @JsonbProperty("id")
+    @JsonProperty("id")
     private UUID rentId;
 
-    @JsonbProperty("rentStartDate")
+    @JsonProperty("rentStartDate")
     private GregorianCalendar rentStartDate;
 
-    @JsonbProperty("rentEndDate")
+    @JsonProperty("rentEndDate")
     private GregorianCalendar rentEndDate;
 
-    @JsonbProperty("account")
+    @JsonProperty("account")
     private ClientAccountDto account;
 
-    @JsonbProperty("room")
+    @JsonProperty("room")
     private RoomDto room;
 
     public RentDtoGet() {

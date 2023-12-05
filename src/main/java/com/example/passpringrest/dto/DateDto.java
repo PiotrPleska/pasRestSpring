@@ -1,21 +1,22 @@
 package com.example.passpringrest.dto;
 
-import jakarta.json.bind.annotation.JsonbCreator;
-import jakarta.json.bind.annotation.JsonbProperty;
-import jakarta.json.bind.annotation.JsonbDateFormat;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.GregorianCalendar;
 
 public class DateDto {
 
-    @JsonbDateFormat("yyyy-MM-dd'T'HH:mm:ssX")
+    @JsonFormat
+            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private GregorianCalendar date;
 
     public DateDto() {
     }
 
-    @JsonbCreator
-    public DateDto(@JsonbProperty("rentEndDate") GregorianCalendar date) {
+    @JsonCreator
+    public DateDto(@JsonProperty("rentEndDate") GregorianCalendar date) {
         this.date = date;
     }
 

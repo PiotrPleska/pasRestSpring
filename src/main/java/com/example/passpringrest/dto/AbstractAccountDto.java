@@ -1,7 +1,7 @@
 package com.example.passpringrest.dto;
 
-import jakarta.json.bind.annotation.JsonbProperty;
-import jakarta.json.bind.annotation.JsonbCreator;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -9,12 +9,12 @@ import java.util.UUID;
 
 public abstract class AbstractAccountDto {
 
-    @JsonbProperty("id")
+    @JsonProperty("id")
     private UUID id;
 
     @NotNull
     @Size(min = 6, max = 20, message = "Login must be between 6 and 20 characters")
-    @JsonbProperty("login")
+    @JsonProperty("login")
     private String login;
 
     @NotNull
@@ -23,18 +23,18 @@ public abstract class AbstractAccountDto {
 
     @NotNull
     @Size(min = 11, max = 11, message = "Personal id must be 11 characters")
-    @JsonbProperty("personalId")
+    @JsonProperty("personalId")
     private String personalId;
 
-    @JsonbProperty("active")
+    @JsonProperty("active")
     private boolean active;
 
     public AbstractAccountDto() {
     }
 
-    @JsonbCreator
-    public AbstractAccountDto(@JsonbProperty("login") String login, @JsonbProperty("password") String password,
-                              @JsonbProperty("personalId") String personalId) {
+    @JsonCreator
+    public AbstractAccountDto(@JsonProperty("login") String login, @JsonProperty("password") String password,
+                              @JsonProperty("personalId") String personalId) {
         this.id = UUID.randomUUID();
         this.login = login;
         this.password = password;

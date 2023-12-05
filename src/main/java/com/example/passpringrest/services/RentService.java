@@ -202,7 +202,7 @@ public class RentService {
         rentRepository.updateEndRentDate(uuid, now);
     }
 
-    public void createRent(RentDtoPost rentDtoPost) throws ResourceNotFoundException {
+    public RentDtoGet createRent(RentDtoPost rentDtoPost) throws ResourceNotFoundException {
         AbstractAccount account = accountRepository.readAccountById(new MongoUUID(UUID.fromString(rentDtoPost.getAccountId())));
         Room room = roomRepository.readRoomById(new MongoUUID(UUID.fromString(rentDtoPost.getRoomId())));
         if (account == null) {
@@ -214,7 +214,9 @@ public class RentService {
         }
 
         Rent rent = new Rent(new MongoUUID(UUID.randomUUID()), rentDtoPost.getRentStartDate(), (ClientAccount) account, room);
+        RentDtoGet rentDtoGet = RentConverter.toDto(rent);
         rentRepository.insertRent(rent);
+        return rentDtoGet;
     }
 
 }

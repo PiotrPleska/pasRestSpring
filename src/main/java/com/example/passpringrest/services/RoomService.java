@@ -59,31 +59,36 @@ public class RoomService {
         }
     }
 
-    public void createRoom(RoomDto roomDto) {
+    public RoomDto createRoom(RoomDto roomDto) {
         Room existingRoom = roomRepository.readRoomByRoomNumberWithoutException(roomDto.getRoomNumber());
         if (existingRoom == null) {
-            roomRepository.insertRoom(RoomConverter.toEntity(roomDto));
-            return;
+            Room room = RoomConverter.toEntity(roomDto);
+            roomRepository.insertRoom(room);
+            return RoomConverter.toDto(room);
         }
         throw new ResourceOccupiedException("Room with given room number already exists");
     }
 
-    public void updateRoomPrice(int roomNumber, double newPrice) throws ResourceNotFoundException {
+    public RoomDto updateRoomPrice(int roomNumber, double newPrice) throws ResourceNotFoundException {
         try {
             readRoomByRoomNumber(roomNumber);
         } catch (ResourceNotFoundException e) {
             throw new ResourceNotFoundException("No room with given room number");
         }
         roomRepository.updateRoomPrice(roomNumber, newPrice);
+        Room room = roomRepository.readRoomByRoomNumber(roomNumber);
+        return RoomConverter.toDto(room);
     }
 
-    public void updateRoomCapacity(int roomNumber, int newCapacity) throws ResourceNotFoundException {
+    public RoomDto updateRoomCapacity(int roomNumber, int newCapacity) throws ResourceNotFoundException {
         try {
             readRoomByRoomNumber(roomNumber);
         } catch (ResourceNotFoundException e) {
             throw new ResourceNotFoundException("No room with given room number");
         }
         roomRepository.updateRoomCapacity(roomNumber, newCapacity);
+        Room room = roomRepository.readRoomByRoomNumber(roomNumber);
+        return RoomConverter.toDto(room);
     }
 
     public void deleteRoom(int roomNumber) throws ResourceNotFoundException, ResourceOccupiedException {

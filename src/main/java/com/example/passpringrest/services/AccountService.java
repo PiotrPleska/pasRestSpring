@@ -100,34 +100,38 @@ public class AccountService {
     }
 
     public List<AbstractAccountDto> readAccountsByPartOfLogin(String partOfLogin) throws ResourceNotFoundException {
-            List<AbstractAccount> accounts = accoutRepository.readAccountsByPartOfLogin(partOfLogin);
-            if(accounts.isEmpty()) throw new ResourceNotFoundException("No accounts with given login");
-            List<AbstractAccountDto> accountDtos = new ArrayList<>();
-            for (AbstractAccount account : accounts) {
-                accountDtos.add(AccountConverter.solveAccountDtoType(account));
-            }
-            return accountDtos;
+        List<AbstractAccount> accounts = accoutRepository.readAccountsByPartOfLogin(partOfLogin);
+        if(accounts.isEmpty()) throw new ResourceNotFoundException("No accounts with given login");
+        List<AbstractAccountDto> accountDtos = new ArrayList<>();
+        for (AbstractAccount account : accounts) {
+            accountDtos.add(AccountConverter.solveAccountDtoType(account));
+        }
+        return accountDtos;
     }
 
-    public void updateAccountPasswordByLogin(String login, ClientAccountDto clientDto) throws ResourceNotFoundException {
+    public AbstractAccountDto updateAccountPasswordByLogin(String login, ClientAccountDto clientDto) throws ResourceNotFoundException {
         try {
             readAccountByLogin(login);
         } catch (ResourceNotFoundException e) {
             throw new ResourceNotFoundException("Account with login " + login + " not found");
         }
         accoutRepository.updateAccountPasswordByLogin(login, clientDto.getPassword());
+        AbstractAccount account = accoutRepository.readAccountByLogin(login);
+        return AccountConverter.solveAccountDtoType(account);
     }
 
-    public void updateAccountActiveByLogin(String login, boolean active) throws ResourceNotFoundException {
+    public AbstractAccountDto updateAccountActiveByLogin(String login, boolean active) throws ResourceNotFoundException {
         try {
             readAccountByLogin(login);
         } catch (ResourceNotFoundException e) {
             throw new ResourceNotFoundException("Account with login " + login + " not found");
         }
         accoutRepository.updateAccountActiveByLogin(login, active);
+        AbstractAccount account = accoutRepository.readAccountByLogin(login);
+        return AccountConverter.solveAccountDtoType(account);
     }
 
-    public void createClientAccount(ClientAccountDto clientAccountDto) throws ResourceOccupiedException {
+    public ClientAccountDto createClientAccount(ClientAccountDto clientAccountDto) throws ResourceOccupiedException {
         AbstractAccount existingAccount = accoutRepository.readAccountByLoginWithoutException(clientAccountDto.getLogin());
         if (existingAccount != null) {
             throw new ResourceOccupiedException("Account with given login already exists");
@@ -136,10 +140,12 @@ public class AccountService {
         if (existingAccount != null) {
             throw new ResourceOccupiedException("Account with given personal id already exists");
         }
-        accoutRepository.insertAccount(AccountConverter.toClient(clientAccountDto));
+        ClientAccount clientAccount = AccountConverter.toClient(clientAccountDto);
+        accoutRepository.insertAccount(clientAccount);
+        return AccountConverter.toClientDto(clientAccount);
     }
 
-    public void createAdminAccount(AdminAccountDto adminAccountDto) throws ResourceOccupiedException {
+    public AdminAccountDto createAdminAccount(AdminAccountDto adminAccountDto) throws ResourceOccupiedException {
         AbstractAccount existingAccount = accoutRepository.readAccountByLoginWithoutException(adminAccountDto.getLogin());
         if (existingAccount != null) {
             throw new ResourceOccupiedException("Account with given login already exists");
@@ -148,10 +154,13 @@ public class AccountService {
         if (existingAccount != null) {
             throw new ResourceOccupiedException("Account with given personal id already exists");
         }
-        accoutRepository.insertAccount(AccountConverter.toAdmin(adminAccountDto));
+        var admin = AccountConverter.toAdmin(adminAccountDto);
+        var dtoAdmin = AccountConverter.toAdminDto(admin);
+        accoutRepository.insertAccount(admin);
+        return dtoAdmin;
     }
 
-    public void createResourceManagerAccount(ResourceManagerAccountDto resourceManagerAccountDto) throws ResourceOccupiedException {
+    public ResourceManagerAccountDto createResourceManagerAccount(ResourceManagerAccountDto resourceManagerAccountDto) throws ResourceOccupiedException {
         AbstractAccount existingAccount = accoutRepository.readAccountByLoginWithoutException(resourceManagerAccountDto.getLogin());
         if (existingAccount != null) {
             throw new ResourceOccupiedException("Account with given login already exists");
@@ -160,6 +169,8 @@ public class AccountService {
         if (existingAccount != null) {
             throw new ResourceOccupiedException("Account with given personal id already exists");
         }
-        accoutRepository.insertAccount(AccountConverter.toResourceManager(resourceManagerAccountDto));
+        ResourceManagerAccount resourceManagerAccount = AccountConverter.toResourceManager(resourceManagerAccountDto);
+        accoutRepository.insertAccount(resourceManagerAccount);
+        return AccountConverter.toResourceManagerDto(resourceManagerAccount);
     }
 }
