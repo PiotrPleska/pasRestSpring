@@ -86,7 +86,7 @@ public class RentRepository extends AbstractMongoRepository {
 
             Document rentDocument = rentToDocument(rent);
 
-            Bson filter = Filters.eq("_id", new ObjectId("6568d2f12fbe5b5967446526"));
+            Bson filter = Filters.eq("_id", new ObjectId("65982a8d86e2980d0b3b1647"));
             Bson update = Updates.push("activeRents", rentDocument);
 
             activeRentsCollection.updateOne(filter, update);
@@ -118,7 +118,7 @@ public class RentRepository extends AbstractMongoRepository {
                 Document rentDocument =
                         activeRents.stream().filter(activeRent -> activeRent.getInteger("roomNumber") == roomNumber).findFirst().orElse(null);
 
-                Bson filter = Filters.eq("_id", new ObjectId("6568d2f12fbe5b5967446526"));
+                Bson filter = Filters.eq("_id", new ObjectId("65982a8d86e2980d0b3b1647"));
                 Bson update = Updates.pull("activeRents", rentDocument);
 
                 activeRentsCollection.updateOne(filter, update);

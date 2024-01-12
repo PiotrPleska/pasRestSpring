@@ -69,10 +69,22 @@ public class AccountController {
     }
 
 
-    @PutMapping(value = "/password/{login}", produces = "application/json")
-    public ResponseEntity<AbstractAccountDto> updateAccountPasswordByLogin(@PathVariable("login") @NotNull String login,
+    @PutMapping(value = "/client/password/{login}", produces = "application/json")
+    public ResponseEntity<AbstractAccountDto> updateClientAccountPasswordByLogin(@PathVariable("login") @NotNull String login,
                                                                            @RequestBody @Valid @NotNull ClientAccountDto acc) {
-        return ResponseEntity.status(HttpStatus.OK).body(accountService.updateAccountPasswordByLogin(login, acc));
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.updateClientAccountPasswordByLogin(login, acc));
+    }
+
+    @PutMapping(value = "/admin/password/{login}", produces = "application/json")
+    public ResponseEntity<AbstractAccountDto> updateAdminAccountPasswordByLogin(@PathVariable("login") @NotNull String login,
+                                                                           @RequestBody @Valid @NotNull AdminAccountDto acc) {
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.updateAdminAccountPasswordByLogin(login, acc));
+    }
+
+    @PutMapping(value = "/resource-manager/password/{login}", produces = "application/json")
+    public ResponseEntity<AbstractAccountDto> updateAdminAccountPasswordByLogin(@PathVariable("login") @NotNull String login,
+                                                                                @RequestBody @Valid @NotNull ResourceManagerAccountDto acc) {
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.updateResourceManagerAccountPasswordByLogin(login, acc));
     }
 
 

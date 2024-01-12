@@ -192,7 +192,7 @@ public class AccoutControllerTest {
                 .contentType("application/json")
                 .body(json.toString())
                 .when()
-                .put(baseUrl + "/password/" + clientAccount.getLogin())
+                .put(baseUrl + "/client/password/" + clientAccount.getLogin())
                 .then().statusCode(200);
 
 // I am not testing if password has changed because I don't have access to it

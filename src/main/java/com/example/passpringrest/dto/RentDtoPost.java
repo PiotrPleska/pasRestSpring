@@ -9,7 +9,7 @@ import java.util.GregorianCalendar;
 public class RentDtoPost {
 
     @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+            (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private GregorianCalendar rentStartDate;
     private String accountId;
     private String roomId;

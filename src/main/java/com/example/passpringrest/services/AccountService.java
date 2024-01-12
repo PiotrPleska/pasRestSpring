@@ -109,7 +109,7 @@ public class AccountService {
         return accountDtos;
     }
 
-    public AbstractAccountDto updateAccountPasswordByLogin(String login, ClientAccountDto clientDto) throws ResourceNotFoundException {
+    public AbstractAccountDto updateClientAccountPasswordByLogin(String login, ClientAccountDto clientDto) throws ResourceNotFoundException {
         try {
             readAccountByLogin(login);
         } catch (ResourceNotFoundException e) {
@@ -120,15 +120,35 @@ public class AccountService {
         return AccountConverter.solveAccountDtoType(account);
     }
 
-    public AbstractAccountDto updateAccountActiveByLogin(String login, boolean active) throws ResourceNotFoundException {
+    public AbstractAccountDto updateAdminAccountPasswordByLogin(String login, AdminAccountDto clientDto) throws ResourceNotFoundException {
+        try {
+            readAccountByLogin(login);
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException("Account with login " + login + " not found");
+        }
+        accoutRepository.updateAccountPasswordByLogin(login, clientDto.getPassword());
+        AbstractAccount account = accoutRepository.readAccountByLogin(login);
+        return AccountConverter.solveAccountDtoType(account);
+    }
+
+    public AbstractAccountDto updateResourceManagerAccountPasswordByLogin(String login, ResourceManagerAccountDto clientDto) throws ResourceNotFoundException {
+        try {
+            readAccountByLogin(login);
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException("Account with login " + login + " not found");
+        }
+        accoutRepository.updateAccountPasswordByLogin(login, clientDto.getPassword());
+        AbstractAccount account = accoutRepository.readAccountByLogin(login);
+        return AccountConverter.solveAccountDtoType(account);
+    }
+
+    public void updateAccountActiveByLogin(String login, boolean active) throws ResourceNotFoundException {
         try {
             readAccountByLogin(login);
         } catch (ResourceNotFoundException e) {
             throw new ResourceNotFoundException("Account with login " + login + " not found");
         }
         accoutRepository.updateAccountActiveByLogin(login, active);
-        AbstractAccount account = accoutRepository.readAccountByLogin(login);
-        return AccountConverter.solveAccountDtoType(account);
     }
 
     public ClientAccountDto createClientAccount(ClientAccountDto clientAccountDto) throws ResourceOccupiedException {

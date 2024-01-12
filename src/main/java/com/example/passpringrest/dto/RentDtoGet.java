@@ -15,12 +15,12 @@ public class RentDtoGet {
 
     @JsonProperty("rentStartDate")
     @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+            (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private GregorianCalendar rentStartDate;
 
     @JsonProperty("rentEndDate")
     @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+            (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private GregorianCalendar rentEndDate;
 
     @JsonProperty("account")
