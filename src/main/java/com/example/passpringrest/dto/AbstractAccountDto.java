@@ -4,13 +4,27 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.UUID;
 
-public abstract class AbstractAccountDto {
+
+@AllArgsConstructor
+public abstract class AbstractAccountDto implements UserDetails {
 
     @JsonProperty("id")
     private UUID id;
+
+    @Override
+    public boolean isEnabled() {
+        return this.active;
+    }
 
     @NotNull
     @Size(min = 6, max = 20, message = "Login must be between 6 and 20 characters")
@@ -65,8 +79,16 @@ public abstract class AbstractAccountDto {
         this.login = login;
     }
 
+    @Override
+    public abstract Collection<? extends GrantedAuthority> getAuthorities();
+
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.login;
     }
 
     public void setPassword(String password) {

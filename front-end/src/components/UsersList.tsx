@@ -45,6 +45,17 @@ const UsersList = () => {
         fetchUsers();
     }, []);
 
+    const authenticate = async () => {
+        try {
+            const response = await api.authenticate("korwinkrul123","nowehaslo123");
+            if (response.status === 200) {
+                console.log("Authenticated");
+            }
+        } catch (error) {
+            console.error("Error authenticating:", error);
+        }
+    }
+
     return (
         <>
             <br />
@@ -117,6 +128,7 @@ const UsersList = () => {
                     </tbody>
                 </table>
             )}
+            <button className="btn btn-primary" onClick={() => authenticate()}>EEEEEEEEEEEE</button>
         </>
     );
 };

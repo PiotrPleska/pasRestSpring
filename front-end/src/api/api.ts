@@ -35,6 +35,7 @@ export const api = {
     addRent: (rent: RentPost): ApiResponseType<RentPost> => apiWithConfig.post("/rents", rent),
     endRent: (rentID: string): ApiResponseType<RentGet> => apiWithConfig.delete(`/rents/${rentID}`),
     getRooms: (): ApiResponseType<Array<Room>> => apiWithConfig.get("/rooms"),
+    authenticate: (login: string, password: string): ApiResponseType<String> => apiWithConfig.post("/auth/authenticate", {login, password}),
     // post: (url: string, data: any) => apiWithConfig.post(url, data),
     // put: (url: string, data: any) => apiWithConfig.put(url, data),
     // delete: (url: string) => apiWithConfig.delete(url),
