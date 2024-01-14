@@ -16,15 +16,11 @@ import java.util.UUID;
 
 
 @AllArgsConstructor
-public abstract class AbstractAccountDto implements UserDetails {
+public abstract class AbstractAccountDto {
 
     @JsonProperty("id")
     private UUID id;
 
-    @Override
-    public boolean isEnabled() {
-        return this.active;
-    }
 
     @NotNull
     @Size(min = 6, max = 20, message = "Login must be between 6 and 20 characters")
@@ -79,17 +75,11 @@ public abstract class AbstractAccountDto implements UserDetails {
         this.login = login;
     }
 
-    @Override
-    public abstract Collection<? extends GrantedAuthority> getAuthorities();
 
     public String getPassword() {
         return password;
     }
 
-    @Override
-    public String getUsername() {
-        return this.login;
-    }
 
     public void setPassword(String password) {
         this.password = password;

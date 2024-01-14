@@ -1,6 +1,6 @@
 package com.example.passpringrest.security;
 
-import com.example.passpringrest.services.AccountService;
+import com.example.passpringrest.repositories.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,12 +16,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class ApplicationConfig {
 
-    private final AccountService accountService;
+    private final AccountRepository accountRepository;
 
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return accountService::readAccountByLogin;
+        return accountRepository::readAccountByLogin;
     }
 
     @Bean

@@ -15,21 +15,6 @@ public class AdminAccountDto extends AbstractAccountDto {
     public AdminAccountDto() {
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
-
 
     @JsonCreator
     public AdminAccountDto(@JsonProperty("login") String login, @JsonProperty("password") String password,
@@ -41,8 +26,4 @@ public class AdminAccountDto extends AbstractAccountDto {
         super(id, login, personalId, active);
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-    }
 }
