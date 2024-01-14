@@ -16,7 +16,7 @@ import java.util.UUID;
 
 
 @AllArgsConstructor
-public abstract class AbstractAccountDto {
+public abstract class AbstractAccountDto implements UserDetails {
 
     @JsonProperty("id")
     private UUID id;
@@ -76,8 +76,21 @@ public abstract class AbstractAccountDto {
     }
 
 
+    @Override
+    public abstract Collection<? extends GrantedAuthority> getAuthorities();
+
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return login;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return active;
     }
 
 

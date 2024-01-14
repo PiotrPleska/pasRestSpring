@@ -15,6 +15,26 @@ public class ResourceManagerAccountDto extends AbstractAccountDto {
     public ResourceManagerAccountDto() {
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_RESOURCE_MANAGER"));
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
     @JsonCreator
     public ResourceManagerAccountDto(@JsonProperty("login") String login, @JsonProperty("password") String password,
                                      @JsonProperty("personalId") String personalId) {

@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,6 +35,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
@@ -50,7 +53,7 @@ public class SecurityConfig {
                     requests
                             .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                             .requestMatchers(HttpMethod.POST, "/api/auth/authenticate").permitAll()
-//                            .requestMatchers("/api/accounts").permitAll()
+//                            .requestMatchers("/api/accounts").hasAuthority("ROLE_CLIENT")
 //                            .requestMatchers("/**").permitAll();
                             .requestMatchers("/api/**").authenticated();
 
