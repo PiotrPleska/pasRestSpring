@@ -1,8 +1,7 @@
 package com.example.passpringrest.controllers;
 
-import com.example.passpringrest.dto.AuthenticationDto;
-import com.example.passpringrest.dto.AuthenticationResponseDto;
-import com.example.passpringrest.dto.RegisterDto;
+import com.example.passpringrest.dto.*;
+import com.example.passpringrest.entities.ClientAccount;
 import com.example.passpringrest.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +17,29 @@ public class AuthenticationController {
 
     private final AuthenticationService service;
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponseDto> register(
-            @RequestBody RegisterDto request
+    @PostMapping("/client")
+    public ResponseEntity<String> registerClient(
+            @RequestBody ClientAccountDto request
     ) {
-        return ResponseEntity.ok(service.register(request));
+        return ResponseEntity.ok(service.registerClient(request));
+    }
+
+    @PostMapping("/admin")
+    public ResponseEntity<String> registerAdmin(
+            @RequestBody AdminAccountDto request
+    ) {
+        return ResponseEntity.ok(service.registerAdmin(request));
+    }
+
+    @PostMapping("/resource-manager")
+    public ResponseEntity<String> registerResourceManager(
+            @RequestBody ResourceManagerAccountDto request
+    ) {
+        return ResponseEntity.ok(service.registerResourceManager(request));
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponseDto> register(
+    public ResponseEntity<String> authenticate(
             @RequestBody AuthenticationDto request
     ) {
         return ResponseEntity.ok(service.authenticate(request));

@@ -51,8 +51,8 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> {
                     requests
-                            .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
-                            .requestMatchers(HttpMethod.POST, "/api/auth/authenticate").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+//                            .requestMatchers(HttpMethod.POST, "/api/auth/authenticate").permitAll()
 //                            .requestMatchers("/api/accounts").hasAuthority("ROLE_CLIENT")
 //                            .requestMatchers("/**").permitAll();
                             .requestMatchers("/api/**").authenticated();

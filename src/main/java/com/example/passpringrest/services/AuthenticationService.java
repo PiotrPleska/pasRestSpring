@@ -1,9 +1,6 @@
 package com.example.passpringrest.services;
 
-import com.example.passpringrest.dto.AuthenticationDto;
-import com.example.passpringrest.dto.AuthenticationResponseDto;
-import com.example.passpringrest.dto.RegisterDto;
-import com.example.passpringrest.dto.ClientAccountDto;
+import com.example.passpringrest.dto.*;
 import com.example.passpringrest.entities.AbstractAccount;
 import com.example.passpringrest.entities.ClientAccount;
 import com.example.passpringrest.repositories.AccountRepository;
@@ -19,20 +16,30 @@ import org.springframework.stereotype.Service;
 public class AuthenticationService {
 
     private final AccountRepository accountRepository;
+    private final AccountService accountService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponseDto register(RegisterDto request) {
-        AbstractAccount user = new ClientAccount(request.getLogin(), passwordEncoder.encode(request.getPassword()), request.getPersonalId(),true);
-        accountRepository.insertAccount(user);
-        var token = jwtService.generateToken(user);
-        return AuthenticationResponseDto.builder()
-                .token(token)
-                .build();
+    public String registerClient(ClientAccountDto request) {
+        ClientAccountDto user = new ClientAccountDto(request.getLogin(), passwordEncoder.encode(request.getPassword()), request.getPersonalId());
+        accountService.createClientAccount(user);
+        return jwtService.generateToken(user);
     }
 
-    public AuthenticationResponseDto authenticate(AuthenticationDto request) {
+    public String registerAdmin(AdminAccountDto request) {
+        AdminAccountDto user = new AdminAccountDto(request.getLogin(), passwordEncoder.encode(request.getPassword()), request.getPersonalId());
+        accountService.createAdminAccount(user);
+        return jwtService.generateToken(user);
+    }
+
+    public String registerResourceManager(ResourceManagerAccountDto request) {
+        ResourceManagerAccountDto user = new ResourceManagerAccountDto(request.getLogin(), passwordEncoder.encode(request.getPassword()), request.getPersonalId());
+        accountService.createResourceManagerAccount(user);
+        return jwtService.generateToken(user);
+    }
+
+    public String authenticate(AuthenticationDto request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getLogin(),
@@ -40,9 +47,6 @@ public class AuthenticationService {
                 )
         );
         var user = accountRepository.readAccountByLogin(request.getLogin());
-        var token = jwtService.generateToken(user);
-        return AuthenticationResponseDto.builder()
-                .token(token)
-                .build();
+        return jwtService.generateToken(user);
     }
 }
