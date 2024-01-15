@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,22 +36,26 @@ public class RoomController {
     }
 
     @PutMapping(value = "/price/{roomNumber}", consumes = "application/json", produces = "application/json")
+    @PreAuthorize("hasAuthority('ROLE_RESOURCE_MANAGER')")
     public ResponseEntity<RoomDto> updateRoomPrice(@PathVariable("roomNumber") int roomNumber, @RequestBody @Valid @NotNull RoomDto roomDto) {
         return ResponseEntity.status(HttpStatus.OK).body(roomService.updateRoomPrice(roomNumber, roomDto.getBasePrice()));
     }
 
     @PutMapping(value = "/capacity/{roomNumber}", produces = "application/json")
+    @PreAuthorize("hasAuthority('ROLE_RESOURCE_MANAGER')")
     public ResponseEntity<RoomDto> updateRoomCapacity(@PathVariable("roomNumber") @NotNull int roomNumber,
                                                       @RequestBody @Valid @NotNull RoomDto roomDto) {
         return ResponseEntity.status(HttpStatus.OK).body(roomService.updateRoomCapacity(roomNumber, roomDto.getRoomCapacity()));
     }
 
     @DeleteMapping(value = "/{roomNumber}", produces = "application/json")
+    @PreAuthorize("hasAuthority('ROLE_RESOURCE_MANAGER')")
     public void deleteRoom(@PathVariable("roomNumber") @NotNull int roomNumber) {
         roomService.deleteRoom(roomNumber);
     }
 
     @PostMapping(consumes = "application/json", produces = "application/json")
+    @PreAuthorize("hasAuthority('ROLE_RESOURCE_MANAGER')")
     public ResponseEntity<RoomDto> addRoom(@RequestBody @Valid @NotNull RoomDto roomDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(roomService.createRoom(roomDto));
     }

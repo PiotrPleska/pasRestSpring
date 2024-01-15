@@ -32,10 +32,9 @@ public class AccoutControllerTest {
     @BeforeEach
     public void clearData() {
         accountRepository = new AccountRepository();
-        clientAccount = new ClientAccount(new MongoUUID(UUID.randomUUID()), "korwinkrul123", "haslo123", "45032103673", true);
-        adminAccount = new AdminAccount(new MongoUUID(UUID.randomUUID()), "admin123", "haslo123", "45032103674", true);
-        resourceManagerAccount = new ResourceManagerAccount(new MongoUUID(UUID.randomUUID()), "manager123", "haslo123", "45032103675", true);
-        accountRepository.dropAccountCollection();
+        clientAccount = new ClientAccount(new MongoUUID(UUID.randomUUID()), "client", "$2a$10$r5tOVCplYnqf7lTX9IlSOO9LajH6ddBf9CuzbYH7/XREAZ5ALzWE.", "45032153673", true);
+        adminAccount = new AdminAccount(new MongoUUID(UUID.randomUUID()), "admin", "$2a$10$r5tOVCplYnqf7lTX9IlSOO9LajH6ddBf9CuzbYH7/XREAZ5ALzWE.", "45031103674", true);
+        resourceManagerAccount = new ResourceManagerAccount(new MongoUUID(UUID.randomUUID()), "manager", "$2a$10$r5tOVCplYnqf7lTX9IlSOO9LajH6ddBf9CuzbYH7/XREAZ5ALzWE.", "45034103675", true);
         accountRepository.insertAccount(clientAccount);
         accountRepository.insertAccount(adminAccount);
         accountRepository.insertAccount(resourceManagerAccount);

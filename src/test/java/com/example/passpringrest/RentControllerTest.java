@@ -54,7 +54,7 @@ public class RentControllerTest {
 
         //Set activeRents to empty array
 
-        clientAccount = new ClientAccount(new MongoUUID(UUID.randomUUID()), "korwinkrul123", "haslo123", "45032103673", true);
+        clientAccount = new ClientAccount(new MongoUUID(UUID.randomUUID()), "korwinkrul123", "$2a$10$r5tOVCplYnqf7lTX9IlSOO9LajH6ddBf9CuzbYH7/XREAZ5ALzWE.", "45032103673", true);
         room = new Room(new MongoUUID(UUID.randomUUID()), 1, 2, 3);
         room2 = new Room(new MongoUUID(UUID.randomUUID()), 2, 2, 3);
 
