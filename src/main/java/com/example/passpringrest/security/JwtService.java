@@ -43,9 +43,13 @@ public class JwtService {
     }
 
     public String generateToken(Map<String, Object> claims, UserDetails userDetails) {
+        var authorities = userDetails.getAuthorities();
+        String role = authorities.stream().findFirst().get().getAuthority();
+        System.out.println(authorities);
         return Jwts
                 .builder()
                 .setClaims(claims)
+                .claim("role", role)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))

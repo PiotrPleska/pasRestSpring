@@ -84,7 +84,7 @@ public class RentController {
 
 
     @GetMapping(value = "/account-id/{id}", produces = "application/json")
-    @PreAuthorize("@securityService.canAccessByAccountId(authentication, #id) or hasAuthority('ROLE_RESOURCE_MANAGER')")
+    @PreAuthorize("@securityService.canAccessByAccountId(authentication, #id) or hasAuthority('ROLE_RESOURCE_MANAGER') or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<List<RentDtoGet>> getRentsByAccountId(@PathVariable("id") String id) {
         return ResponseEntity.status(HttpStatus.OK).body(rentService.readAllRentsByAccountId(id));
     }

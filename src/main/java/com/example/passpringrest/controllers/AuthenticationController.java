@@ -41,20 +41,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<String> authenticate(
-            @RequestBody AuthenticationDto request,
-            HttpServletResponse response
-    ) {
-        String token = service.authenticate(request);
-
-        Cookie cookie = new Cookie("token", token);
-
-        cookie.setMaxAge(3600);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-
-        response.addCookie(cookie);
-
-        return ResponseEntity.ok("Authentication successful");
+    public ResponseEntity<String> authenticate(@RequestBody AuthenticationDto request) {
+        return ResponseEntity.ok(service.authenticate(request));
     }
 }

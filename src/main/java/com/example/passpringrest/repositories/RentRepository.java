@@ -86,7 +86,7 @@ public class RentRepository extends AbstractMongoRepository {
 
             Document rentDocument = rentToDocument(rent);
 
-            Bson filter = Filters.eq("_id", new ObjectId("6564dac3d384808aa3262c83"));
+            Bson filter = Filters.eq("_id", new ObjectId("6568aeca3aeb7ad9264d8f33"));
             Bson update = Updates.push("activeRents", rentDocument);
 
             activeRentsCollection.updateOne(filter, update);
