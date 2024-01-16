@@ -3,6 +3,8 @@ package com.example.passpringrest.controllers;
 import com.example.passpringrest.dto.*;
 import com.example.passpringrest.entities.ClientAccount;
 import com.example.passpringrest.services.AuthenticationService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,8 +42,19 @@ public class AuthenticationController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<String> authenticate(
-            @RequestBody AuthenticationDto request
+            @RequestBody AuthenticationDto request,
+            HttpServletResponse response
     ) {
-        return ResponseEntity.ok(service.authenticate(request));
+        String token = service.authenticate(request);
+
+        Cookie cookie = new Cookie("token", token);
+
+        cookie.setMaxAge(3600);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok("Authentication successful");
     }
 }
