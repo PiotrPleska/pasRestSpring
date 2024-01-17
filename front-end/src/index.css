@@ -13,6 +13,7 @@
 
 #root {
   max-width: 1280px;
+  min-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -36,6 +37,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  padding-top: 50px;
 }
 
 h1 {
@@ -78,4 +80,37 @@ label {
   button {
     background-color: #f9f9f9;
   }
+}
+
+.navbar {
+  background-color: #333; /* Set your preferred background color */
+  padding: 10px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.nav-item {
+  margin-right: 10px; /* Adjust the spacing between items */
+}
+
+.nav-item a {
+  text-decoration: none;
+  color: #fff; /* Set your preferred text color */
+  font-weight: bold;
+}
+
+.nav-item a:hover {
+  text-decoration: underline; /* Change appearance on hover if desired */
 }
