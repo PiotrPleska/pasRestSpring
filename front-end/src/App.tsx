@@ -8,14 +8,18 @@ import {HomePage} from "./components/HomePage.tsx";
 import UsersList from "./components/UsersList.tsx";
 import {UserContextProvider, useUserContext} from "./Context/UserProvider.tsx";
 
-
+const clearStorage = () => {
+    localStorage.clear();
+    console.log("Storage cleared");
+    window.location.reload();
+}
 
 function App() {
     return (
         <BrowserRouter>
             <UserContextProvider>
                 <Routes>
-                    <Route element={<Layout />}>
+                    <Route element={<Layout/>}>
                         <Route path="/" element={<HomePage/>}/>
                         <Route path={`/manage/:personalId/:accountType`} element={<ManageUser/>}/>
                         <Route path={`/rents/:accountId`} element={<ClientRents/>}/>
@@ -44,14 +48,26 @@ function Layout() {
                     <li className="nav-item">
                         <Link to={'/addAccount'}>Add User</Link>
                     </li>
+                    <li>
+                        {user ? (
+                            <Link to={'/'} onClick={clearStorage}>Log out</Link>
+                        ) : (
+                            <Link to={'/'}>Log in</Link>
+                        )}
+                    </li>
+                    <li>
+                        {user ? (
+                            user.login
+                            ) : (
+                                <p>
+                                    Not logged in
+                                </p>
+                            )
+                        }
+                    </li>
                 </ul>
-                {user ? (
-                    <div className="user-info">
-                        <p>User: {user.login}</p>
-                    </div>
-                ) : null}
             </nav>
-            <Outlet />
+            <Outlet/>
         </div>
     );
 }
