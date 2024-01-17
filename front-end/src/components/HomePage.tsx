@@ -4,6 +4,8 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import {api} from "../api/api.ts";
 import {AccountLogin} from "../types/Account.ts";
 import {jwtDecode, JwtPayload} from "jwt-decode";
+import {useUserContext} from "../Context/UserProvider.tsx";
+import {AccountTypeEnum} from "../enums/AccountType.enum.ts";
 
 interface CustomJwtPayload extends JwtPayload {
     role?: string;
@@ -24,6 +26,7 @@ export function HomePage() {
             resolver: yupResolver(schema),
         }
     );
+    const {user, setUser} = useUserContext();
 
     const clearStorage = () => {
         localStorage.clear();
@@ -39,11 +42,21 @@ export function HomePage() {
         console.log(client.password);
         const token = await api.logIn(client);
         const decodedToken = jwtDecode<CustomJwtPayload>(token.data);
-        const userRole: string | undefined = decodedToken?.role;
 
-        console.log(userRole);
         localStorage.setItem('token', token.data);
         console.log("item set to :" + localStorage.getItem('token'));
+        let userRole: AccountTypeEnum;
+        if (decodedToken?.role === 'admin') {
+            userRole = AccountTypeEnum.ADMIN
+        } else if (decodedToken?.role === 'user') {
+            userRole = AccountTypeEnum.ADMIN
+        } else {
+            userRole = AccountTypeEnum.RESOURCE_MANAGER
+        }
+        setUser({
+            login: client.login? client.login : '',
+            accountType: userRole,
+        });
     };
 
     const handleSubmitFrom = (data: AddUserFormType) => {
@@ -66,6 +79,9 @@ export function HomePage() {
                 <br />
                 <button type="submit">Log In</button>
             </form>
+            <p>
+                {user?.login}
+            </p>
             <button onClick={clearStorage}>Clear Storage</button>
         </>
     );

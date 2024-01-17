@@ -2,6 +2,7 @@ import {api} from "../api/api.ts";
 import type {Account} from "../types/Account.ts";
 import {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
+import {useUserContext} from "../Context/UserProvider.tsx";
 
 
 const UsersList = () => {
@@ -11,6 +12,7 @@ const UsersList = () => {
     const [filteredClients, setFilteredClients] = useState(new Array<Account>());
     const [filteredAdmins, setFilteredAdmins] = useState(new Array<Account>());
     const [filteredResourceManagers, setFilteredResourceManagers] = useState(new Array<Account>());
+    const {user} = useUserContext();
 
     const filterUsers = (clients: Account[], admins: Account[], resourceManagers: Account[], search: string) => {
         if (search === "" || search === undefined || search === null) {
@@ -58,7 +60,7 @@ const UsersList = () => {
 
     return (
         <>
-            <br />
+            <br/>
             <input
                 type="text"
                 placeholder="Search by user ID"
@@ -128,7 +130,11 @@ const UsersList = () => {
                     </tbody>
                 </table>
             )}
+            <p>
+                {user?.login}
+            </p>
         </>
+
     );
 };
 
