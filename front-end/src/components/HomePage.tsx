@@ -6,6 +6,7 @@ import {AccountLogin} from "../types/Account.ts";
 import {jwtDecode, JwtPayload} from "jwt-decode";
 import {useUserContext} from "../Context/UserProvider.tsx";
 import {AccountTypeEnum} from "../enums/AccountType.enum.ts";
+import {useNavigate} from "react-router-dom";
 
 interface CustomJwtPayload extends JwtPayload {
     role?: string;
@@ -27,6 +28,7 @@ export function HomePage() {
         }
     );
     const {setUser} = useUserContext();
+    const naviagte = useNavigate();
 
     const handleConfirmSubmit = async (formData: AddUserFormType) => {
         const client: AccountLogin = {
@@ -53,6 +55,9 @@ export function HomePage() {
             login: client.login? client.login : '',
             accountType: userRole,
         });
+        if (userRole === AccountTypeEnum.CLIENT) {
+            naviagte('/Home');
+        }
     };
 
     const handleSubmitFrom = (data: AddUserFormType) => {

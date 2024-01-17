@@ -7,6 +7,7 @@ import {RentAddForm} from "./components/RentAddForm.tsx";
 import {HomePage} from "./components/HomePage.tsx";
 import UsersList from "./components/UsersList.tsx";
 import {UserContextProvider, useUserContext} from "./Context/UserProvider.tsx";
+import {UserView} from "./components/UserView.tsx";
 
 const clearStorage = () => {
     localStorage.clear();
@@ -27,6 +28,7 @@ function App() {
                         <Route path={'/addAccount'} element={<UserAddForm/>}/>
                         <Route path={'/addRent/:accountId'} element={<RentAddForm/>}/>
                         <Route path={'/UsersList'} element={<UsersList/>}/>
+                        <Route path={'/Home'} element={<UserView/>}/>
                     </Route>
                 </Routes>
             </UserContextProvider>

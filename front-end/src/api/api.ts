@@ -49,6 +49,7 @@ export const apiForLogin = axios.create({
 export const api = {
     getAccounts: (): ApiResponseType<Array<Account>> => apiWithConfig.get("/accounts"),
     getAccount: (id: string): ApiResponseType<Account> => apiWithConfig.get(`/accounts/personal-id/${id}`),
+    getAccountByLogin: (login: string | undefined): ApiResponseType<Account> => apiWithConfig.get(`/accounts/login/${login}`),
     getClientAccounts: (): ApiResponseType<Array<Account>> => apiWithConfig.get("/accounts/clients"),
     getAdminAccounts: (): ApiResponseType<Array<Account>> => apiWithConfig.get("/accounts/admins"),
     getResourceManagerAccounts: (): ApiResponseType<Array<Account>> => apiWithConfig.get("/accounts/resource-managers"),
