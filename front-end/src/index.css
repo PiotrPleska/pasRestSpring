@@ -114,3 +114,7 @@ label {
 .nav-item a:hover {
   text-decoration: underline; /* Change appearance on hover if desired */
 }
+
+li > p {
+    margin: 10px;
+}

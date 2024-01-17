@@ -38,19 +38,19 @@ public class AccountController {
     }
 
     @GetMapping(value = "/admins", produces = "application/json")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAnyAuthority('ROLE_RESOURCE_MANAGER')")
     public ResponseEntity<List<AbstractAccountDto>>  getAdminAccounts() {
         return ResponseEntity.status(HttpStatus.OK).body(accountService.readAdminAccounts());
     }
 
     @GetMapping(value = "/resource-managers", produces = "application/json")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAnyAuthority('ROLE_RESOURCE_MANAGER')")
     public ResponseEntity<List<AbstractAccountDto>>  getResourceManagerAccounts() {
         return ResponseEntity.status(HttpStatus.OK).body(accountService.readResourceManagerAccounts());
     }
 
     @GetMapping(value = "/clients", produces = "application/json")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAnyAuthority('ROLE_RESOURCE_MANAGER')")
     public ResponseEntity<List<AbstractAccountDto>> getClientAccounts() {
         return ResponseEntity.status(HttpStatus.OK).body(accountService.readClientAccounts());
     }

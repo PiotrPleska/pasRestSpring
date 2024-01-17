@@ -52,6 +52,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((requests) -> {
                     requests
                             .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/api/rooms").permitAll()
 //                            .requestMatchers(HttpMethod.POST, "/api/auth/authenticate").permitAll()
 //                            .requestMatchers("/api/accounts").hasAuthority("ROLE_CLIENT")
 //                            .requestMatchers("/**").permitAll();
@@ -70,10 +71,14 @@ public class SecurityConfig {
         configuration.setAllowedHeaders(Arrays.asList(
                 HttpHeaders.CONTENT_TYPE,
                 HttpHeaders.AUTHORIZATION,
-                HttpHeaders.ACCEPT
+                HttpHeaders.ACCEPT,
+                HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN,
+                HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS,
+                HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS
                 ));
 
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "PATCH, OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"));
+
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

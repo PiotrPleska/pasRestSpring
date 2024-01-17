@@ -13,6 +13,7 @@ export const DEFAULT_HEADERS = {
     Accept: 'application/json',
     'Content-type': 'application/json',
     Authorization: getAuthToken(),
+    'Access-Control-Allow-Origin': '*',
 }
 
 

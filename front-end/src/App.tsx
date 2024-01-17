@@ -12,6 +12,7 @@ const clearStorage = () => {
     localStorage.clear();
     console.log("Storage cleared");
     window.location.reload();
+    window.location.href = "/";
 }
 
 function App() {
@@ -57,11 +58,13 @@ function Layout() {
                     </li>
                     <li>
                         {user ? (
-                            user.login
-                            ) : (
                                 <p>
-                                    Not logged in
+                                    {user.login}
                                 </p>
+                            ) : (
+                            <p>
+                            Not logged in
+                            </p>
                             )
                         }
                     </li>

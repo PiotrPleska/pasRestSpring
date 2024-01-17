@@ -26,13 +26,7 @@ export function HomePage() {
             resolver: yupResolver(schema),
         }
     );
-    const {user, setUser} = useUserContext();
-
-    const clearStorage = () => {
-        localStorage.clear();
-        console.log("Storage cleared");
-        window.location.reload();
-    }
+    const {setUser} = useUserContext();
 
     const handleConfirmSubmit = async (formData: AddUserFormType) => {
         const client: AccountLogin = {
@@ -47,10 +41,11 @@ export function HomePage() {
         localStorage.setItem('token', token.data);
         console.log("item set to :" + localStorage.getItem('token'));
         let userRole: AccountTypeEnum;
-        if (decodedToken?.role === 'admin') {
+        console.log(decodedToken?.role);
+        if (decodedToken?.role === 'ROLE_ADMIN') {
             userRole = AccountTypeEnum.ADMIN
-        } else if (decodedToken?.role === 'user') {
-            userRole = AccountTypeEnum.ADMIN
+        } else if (decodedToken?.role === 'ROLE_CLIENT') {
+            userRole = AccountTypeEnum.CLIENT
         } else {
             userRole = AccountTypeEnum.RESOURCE_MANAGER
         }
@@ -80,10 +75,6 @@ export function HomePage() {
                 <br />
                 <button type="submit">Log In</button>
             </form>
-            <p>
-                {user?.login}
-            </p>
-            <button onClick={clearStorage}>Log Out</button>
         </>
     );
 }

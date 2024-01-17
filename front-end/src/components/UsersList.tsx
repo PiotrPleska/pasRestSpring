@@ -3,6 +3,7 @@ import type {Account} from "../types/Account.ts";
 import {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {useUserContext} from "../Context/UserProvider.tsx";
+import {AccountTypeEnum} from "../enums/AccountType.enum.ts";
 
 
 const UsersList = () => {
@@ -33,12 +34,13 @@ const UsersList = () => {
                 const adminsResponse = await api.getAdminAccounts();
                 const resourceManagersResponse = await api.getResourceManagerAccounts();
                 const clientsData = clientsResponse.data;
-                const adminsData = adminsResponse.data;
-                const resourceManagersData = resourceManagersResponse.data;
                 setClients(clientsData);
+                const adminsData = adminsResponse.data;
                 setAdmins(adminsData);
+                const resourceManagersData = resourceManagersResponse.data;
                 setResourceManagers(resourceManagersData);
                 filterUsers(clientsData, adminsData, resourceManagersData, "");
+
             } catch (error) {
                 console.error("Error fetching users:", error);
             }
@@ -83,45 +85,68 @@ const UsersList = () => {
                     </tr>
                     </thead>
                     <tbody>
-                    {filteredClients.map((user) => (
-                        <tr key={user.id}>
-                            <td>{user.id}</td>
-                            <td>{user.login}</td>
-                            <td>{user.personalId}</td>
-                            <td>{user.active ? "Yes" : "No"}</td>
+                    {filteredClients.map((account) => (
+                        <tr key={account.id}>
+                            <td>{account.id}</td>
+                            <td>{account.login}</td>
+                            <td>{account.personalId}</td>
+                            <td>{account.active ? "Yes" : "No"}</td>
                             <td>CLIENT</td>
                             <td>
-                                <Link to={`/manage/${user.personalId}/client`}>Manage</Link>
+                                {user?.accountType === AccountTypeEnum.ADMIN ? (
+                                <Link to={`/manage/${account.personalId}/client`}>Manage</Link>
+                                ) : (
+                                    <></>
+                                )}
                             </td>
                             <td>
-                                <Link to={`/rents/${user.id}`}>Check Rents</Link>
+                                {user?.accountType === AccountTypeEnum.RESOURCE_MANAGER ? (
+                                    <Link to={`/rents/${account.id}`}>Check Rents</Link>
+                                ) : (
+                                    <></>
+                                )}
                             </td>
-                            <td><Link to={`/addRent/${user.id}`}>Add Rent</Link></td>
+
+                            <td>
+                                {user?.accountType === AccountTypeEnum.RESOURCE_MANAGER ? (
+                                    <Link to={`/addRent/${account.id}`}>Add Rent</Link>
+                                ) : (
+                                    <></>
+                                )}
+                            </td>
                         </tr>
                     ))}
-                    {filteredAdmins.map((user) => (
-                        <tr key={user.id}>
-                            <td>{user.id}</td>
-                            <td>{user.login}</td>
-                            <td>{user.personalId}</td>
-                            <td>{user.active ? "Yes" : "No"}</td>
+                    {filteredAdmins.map((account) => (
+                        <tr key={account.id}>
+                            <td>{account.id}</td>
+                            <td>{account.login}</td>
+                            <td>{account.personalId}</td>
+                            <td>{account.active ? "Yes" : "No"}</td>
                             <td>ADMIN</td>
                             <td>
-                                <Link to={`/manage/${user.personalId}/admin`}>Manage</Link>
+                                {user?.accountType === AccountTypeEnum.ADMIN ? (
+                                    <Link to={`/manage/${account.personalId}/client`}>Manage</Link>
+                                ) : (
+                                    <></>
+                                )}
                             </td>
                             <td></td>
                             <td></td>
                         </tr>
                     ))}
-                    {filteredResourceManagers.map((user) => (
-                        <tr key={user.id}>
-                            <td>{user.id}</td>
-                            <td>{user.login}</td>
-                            <td>{user.personalId}</td>
-                            <td>{user.active ? "Yes" : "No"}</td>
+                    {filteredResourceManagers.map((account) => (
+                        <tr key={account.id}>
+                            <td>{account.id}</td>
+                            <td>{account.login}</td>
+                            <td>{account.personalId}</td>
+                            <td>{account.active ? "Yes" : "No"}</td>
                             <td>RESOURCE MANAGER</td>
                             <td>
-                                <Link to={`/manage/${user.personalId}/resourceManager`}>Manage</Link>
+                                {user?.accountType === AccountTypeEnum.ADMIN ? (
+                                    <Link to={`/manage/${account.personalId}/client`}>Manage</Link>
+                                ) : (
+                                    <></>
+                                )}
                             </td>
                             <td></td>
                             <td></td>
@@ -130,9 +155,6 @@ const UsersList = () => {
                     </tbody>
                 </table>
             )}
-            <p>
-                {user?.login}
-            </p>
         </>
 
     );
