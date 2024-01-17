@@ -31,6 +31,7 @@ export function HomePage() {
     const clearStorage = () => {
         localStorage.clear();
         console.log("Storage cleared");
+        window.location.reload();
     }
 
     const handleConfirmSubmit = async (formData: AddUserFormType) => {
@@ -82,7 +83,7 @@ export function HomePage() {
             <p>
                 {user?.login}
             </p>
-            <button onClick={clearStorage}>Clear Storage</button>
+            <button onClick={clearStorage}>Log Out</button>
         </>
     );
 }

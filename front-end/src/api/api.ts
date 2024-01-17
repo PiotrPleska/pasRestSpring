@@ -6,11 +6,15 @@ import {Room} from "../types/Room.ts";
 
 export const API_URL = "https://localhost:8080/api"
 export const TIMEOUT_IN_MS = 300000
+
+const getAuthToken = () => 'Bearer ' + localStorage.getItem('token');
+
 export const DEFAULT_HEADERS = {
     Accept: 'application/json',
     'Content-type': 'application/json',
-    'Authorization': 'Bearer ' + localStorage.getItem('token')
+    Authorization: getAuthToken(),
 }
+
 
 export const LOGIN_HEADERS = {
     Accept: 'application/json',
@@ -22,6 +26,18 @@ export const apiWithConfig = axios.create({
     timeout: TIMEOUT_IN_MS,
     headers: DEFAULT_HEADERS,
 })
+
+apiWithConfig.interceptors.request.use(
+    (config) => {
+        // Modify the request config to include the Authorization header
+        config.headers.Authorization = getAuthToken();
+        return config;
+    },
+    (error) => {
+        // Handle request error
+        return Promise.reject(error);
+    }
+);
 
 export const apiForLogin = axios.create({
     baseURL: API_URL,
