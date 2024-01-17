@@ -14,6 +14,7 @@ import com.example.passpringrest.exceptions.ResourceNotFoundException;
 import com.example.passpringrest.exceptions.ResourceOccupiedException;
 import com.example.passpringrest.repositories.AccountRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -26,6 +27,7 @@ import java.util.UUID;
 public class AccountService {
 
     private final AccountRepository accoutRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<AbstractAccountDto> readAllAccounts() {
         List<AbstractAccount> accounts = accoutRepository.readAllAccounts();
@@ -115,7 +117,7 @@ public class AccountService {
         } catch (ResourceNotFoundException e) {
             throw new ResourceNotFoundException("Account with login " + login + " not found");
         }
-        accoutRepository.updateAccountPasswordByLogin(login, clientDto.getPassword());
+        accoutRepository.updateAccountPasswordByLogin(login, passwordEncoder.encode(clientDto.getPassword()));
         AbstractAccount account = accoutRepository.readAccountByLogin(login);
         return AccountConverter.solveAccountDtoType(account);
     }
@@ -126,7 +128,7 @@ public class AccountService {
         } catch (ResourceNotFoundException e) {
             throw new ResourceNotFoundException("Account with login " + login + " not found");
         }
-        accoutRepository.updateAccountPasswordByLogin(login, clientDto.getPassword());
+        accoutRepository.updateAccountPasswordByLogin(login, passwordEncoder.encode(clientDto.getPassword()));
         AbstractAccount account = accoutRepository.readAccountByLogin(login);
         return AccountConverter.solveAccountDtoType(account);
     }
@@ -137,7 +139,7 @@ public class AccountService {
         } catch (ResourceNotFoundException e) {
             throw new ResourceNotFoundException("Account with login " + login + " not found");
         }
-        accoutRepository.updateAccountPasswordByLogin(login, clientDto.getPassword());
+        accoutRepository.updateAccountPasswordByLogin(login, passwordEncoder.encode(clientDto.getPassword()));
         AbstractAccount account = accoutRepository.readAccountByLogin(login);
         return AccountConverter.solveAccountDtoType(account);
     }
@@ -161,6 +163,7 @@ public class AccountService {
             throw new ResourceOccupiedException("Account with given personal id already exists");
         }
         ClientAccount clientAccount = AccountConverter.toClient(clientAccountDto);
+        clientAccount.setPassword(passwordEncoder.encode(clientAccountDto.getPassword()));
         accoutRepository.insertAccount(clientAccount);
         return AccountConverter.toClientDto(clientAccount);
     }
@@ -175,6 +178,7 @@ public class AccountService {
             throw new ResourceOccupiedException("Account with given personal id already exists");
         }
         var admin = AccountConverter.toAdmin(adminAccountDto);
+        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
         var dtoAdmin = AccountConverter.toAdminDto(admin);
         accoutRepository.insertAccount(admin);
         return dtoAdmin;
@@ -190,6 +194,7 @@ public class AccountService {
             throw new ResourceOccupiedException("Account with given personal id already exists");
         }
         ResourceManagerAccount resourceManagerAccount = AccountConverter.toResourceManager(resourceManagerAccountDto);
+        resourceManagerAccount.setPassword(passwordEncoder.encode(resourceManagerAccountDto.getPassword()));
         accoutRepository.insertAccount(resourceManagerAccount);
         return AccountConverter.toResourceManagerDto(resourceManagerAccount);
     }

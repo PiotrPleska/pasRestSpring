@@ -52,7 +52,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests((requests) -> {
                     requests
                             .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
-                            .requestMatchers(HttpMethod.GET, "/api/rooms").permitAll()
 //                            .requestMatchers(HttpMethod.POST, "/api/auth/authenticate").permitAll()
 //                            .requestMatchers("/api/accounts").hasAuthority("ROLE_CLIENT")
 //                            .requestMatchers("/**").permitAll();

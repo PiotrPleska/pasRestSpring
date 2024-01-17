@@ -1,10 +1,14 @@
-import {ManageUser} from "./ManageUser.tsx";
 import {useUserContext} from "../Context/UserProvider.tsx";
 import {useEffect, useState} from "react";
 import {Account} from "../types/Account.ts";
 import {api} from "../api/api.ts";
+import {Link} from "react-router-dom";
+import {UpdatePassword} from "./UpdatePassword.tsx";
+import {AccountTypeEnum} from "../enums/AccountType.enum.ts";
 
 export function UserView() {
+
+
     const {user} = useUserContext();
     const [userAcc, setUserAcc] = useState<Account>();
 
@@ -16,10 +20,23 @@ export function UserView() {
         fetchUser();
     }, []);
 
+
+
+
+
     return (
         <>
-            <h1>Hi</h1>
-            <ManageUser key={`/manage/${userAcc?.personalId}/client`}/>
+            <h1>User Page</h1>
+            <p>ID: {userAcc?.id} </p>
+            <p>Login: {userAcc?.login}</p>
+            <p>Personal ID: {userAcc?.personalId}</p>
+
+            <UpdatePassword user={userAcc} setUser={setUserAcc} accountType="client" />
+            {user?.accountType === AccountTypeEnum.CLIENT && <Link to={`/rents/${userAcc?.id}`}>Check Rents</Link>}
+            <br/>
+            {user?.accountType === AccountTypeEnum.CLIENT && <Link to={`/addRent/${userAcc?.id}`}>Add Rent</Link>}
+
+
         </>
     );
 }

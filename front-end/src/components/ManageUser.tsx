@@ -62,7 +62,7 @@ export function ManageUser() {
 
     return (
         <>
-            <Link to="/">Home</Link>
+            <Link to="/usersList">User List</Link>
             <h1>User Page</h1>
             <p>ID: {personalId} </p>
             <p>Login: {user?.login}</p>
