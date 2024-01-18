@@ -9,6 +9,7 @@ import UsersList from "./components/UsersList.tsx";
 import {UserContextProvider, useUserContext} from "./Context/UserProvider.tsx";
 import {UserView} from "./components/UserView.tsx";
 import {AccountTypeEnum} from "./enums/AccountType.enum.ts";
+import {RegisterPage} from "./components/RegisterPage.tsx";
 
 const clearStorage = () => {
     localStorage.clear();
@@ -30,6 +31,7 @@ function App() {
                         <Route path={'/addRent/:accountId'} element={<RentAddForm/>}/>
                         <Route path={'/UsersList'} element={<UsersList/>}/>
                         <Route path={'/Home'} element={<UserView/>}/>
+                        <Route path={'/Register'} element={<RegisterPage/>}/>
                     </Route>
                 </Routes>
             </UserContextProvider>
