@@ -16,9 +16,11 @@ import com.example.passpringrest.repositories.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -120,6 +122,19 @@ public class AccountService {
         accoutRepository.updateAccountPasswordByLogin(login, passwordEncoder.encode(clientDto.getPassword()));
         AbstractAccount account = accoutRepository.readAccountByLogin(login);
         return AccountConverter.solveAccountDtoType(account);
+    }
+
+    public String generateEtag(String login) {
+        String dataToHash = "MostSecretKeyEver" + login;
+
+        String hashedData = DigestUtils.md5DigestAsHex(dataToHash.getBytes());
+
+        return "\"" + hashedData + "\"";
+    }
+
+    public boolean checkEtag(String etag, String login) {
+        String storedEtag = generateEtag(login);
+        return etag != null && etag.equals(storedEtag);
     }
 
     public AbstractAccountDto updateAdminAccountPasswordByLogin(String login, AdminAccountDto clientDto) throws ResourceNotFoundException {

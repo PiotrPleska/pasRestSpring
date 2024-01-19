@@ -10,7 +10,9 @@ import com.example.passpringrest.services.AccountService;
 import com.example.passpringrest.services.SecurityService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -84,9 +86,24 @@ public class AccountController {
 
     @PutMapping(value = "/client/password/{login}", produces = "application/json")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or #login == principal.username")
-    public ResponseEntity<AbstractAccountDto> updateClientAccountPasswordByLogin(@PathVariable("login") @NotNull String login,
-                                                                           @RequestBody @Valid @NotNull ClientAccountDto acc) {
-        return ResponseEntity.status(HttpStatus.OK).body(accountService.updateClientAccountPasswordByLogin(login, acc));
+    public ResponseEntity<AbstractAccountDto> updateClientAccountPasswordByLogin(
+            @PathVariable("login") @NotNull String login,
+            @RequestBody @Valid @NotNull ClientAccountDto acc,
+            @RequestHeader("If-Match") String etag) {
+
+        if (accountService.checkEtag(etag, login)) {
+
+            AbstractAccountDto updatedAccount = accountService.updateClientAccountPasswordByLogin(login, acc);
+
+            String newEtag = accountService.generateEtag(updatedAccount.getLogin());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setETag(newEtag);
+
+            return ResponseEntity.status(HttpStatus.OK).headers(headers).body(updatedAccount);
+        } else {
+            throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Etag is not valid");
+        }
     }
 
     @PutMapping(value = "/admin/password/{login}", produces = "application/json")
