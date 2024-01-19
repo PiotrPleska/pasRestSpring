@@ -2,14 +2,9 @@ import * as yup from 'yup';
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {api} from "../api/api.ts";
-import {jwtDecode, JwtPayload} from "jwt-decode";
-import {useUserContext} from "../Context/UserProvider.tsx";
+// import {useUserContext} from "../Context/UserProvider.tsx";
 import {AccountTypeEnum} from "../enums/AccountType.enum.ts";
 import {useNavigate} from "react-router-dom";
-
-interface CustomJwtPayload extends JwtPayload {
-    role?: string;
-}
 
 const schema = yup.object({
     login: yup.string().required('Last Name is required').min(2, 'Must be at least 2 characters').max(20, 'Must be less than 20 characters'),
@@ -27,7 +22,7 @@ export function RegisterPage() {
             resolver: yupResolver(schema),
         }
     );
-    const {setUser} = useUserContext();
+    // const {setUser} = useUserContext();
     const naviagte = useNavigate();
 
     const handleConfirmSubmit = async (formData: AddUserFormType) => {
@@ -37,35 +32,10 @@ export function RegisterPage() {
             personalId: formData?.personalId,
             accountType: AccountTypeEnum.CLIENT
         }
-        const registerResult = await api.addClientAccount(client);
+        const registerResult = await api.createAccount(client);
         console.log(registerResult);
         console.log(client.login);
         console.log(client.password);
-        const dataToLogIn = {
-            login: client.login,
-            password: client.password
-        }
-        const token = await api.logIn(dataToLogIn);
-        const decodedToken = jwtDecode<CustomJwtPayload>(token.data);
-
-        localStorage.setItem('token', token.data);
-        console.log("item set to :" + localStorage.getItem('token'));
-        let userRole: AccountTypeEnum;
-        console.log(decodedToken?.role);
-        if (decodedToken?.role === 'ROLE_ADMIN') {
-            userRole = AccountTypeEnum.ADMIN
-        } else if (decodedToken?.role === 'ROLE_CLIENT') {
-            userRole = AccountTypeEnum.CLIENT
-        } else {
-            userRole = AccountTypeEnum.RESOURCE_MANAGER
-        }
-        setUser({
-            login: client.login? client.login : '',
-            accountType: userRole,
-        });
-        if (userRole === AccountTypeEnum.CLIENT) {
-            naviagte('/Home');
-        }
     };
 
     const handleSubmitFrom = (data: AddUserFormType) => {

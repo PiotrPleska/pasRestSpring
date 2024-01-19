@@ -7,6 +7,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.registerClient(request));
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping("/admin")
     public ResponseEntity<String> registerAdmin(
             @RequestBody AdminAccountDto request
@@ -33,6 +35,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.registerAdmin(request));
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping("/resource-manager")
     public ResponseEntity<String> registerResourceManager(
             @RequestBody ResourceManagerAccountDto request

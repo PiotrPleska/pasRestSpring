@@ -22,19 +22,19 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public String registerClient(ClientAccountDto request) {
-        ClientAccountDto user = new ClientAccountDto(request.getLogin(), passwordEncoder.encode(request.getPassword()), request.getPersonalId());
+        ClientAccountDto user = new ClientAccountDto(request.getLogin(), request.getPassword(), request.getPersonalId());
         accountService.createClientAccount(user);
         return jwtService.generateToken(user);
     }
 
     public String registerAdmin(AdminAccountDto request) {
-        AdminAccountDto user = new AdminAccountDto(request.getLogin(), passwordEncoder.encode(request.getPassword()), request.getPersonalId());
+        AdminAccountDto user = new AdminAccountDto(request.getLogin(), request.getPassword(), request.getPersonalId());
         accountService.createAdminAccount(user);
         return jwtService.generateToken(user);
     }
 
     public String registerResourceManager(ResourceManagerAccountDto request) {
-        ResourceManagerAccountDto user = new ResourceManagerAccountDto(request.getLogin(), passwordEncoder.encode(request.getPassword()), request.getPersonalId());
+        ResourceManagerAccountDto user = new ResourceManagerAccountDto(request.getLogin(), request.getPassword(), request.getPersonalId());
         accountService.createResourceManagerAccount(user);
         return jwtService.generateToken(user);
     }
