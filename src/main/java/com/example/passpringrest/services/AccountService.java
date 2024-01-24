@@ -124,18 +124,6 @@ public class AccountService {
         return AccountConverter.solveAccountDtoType(account);
     }
 
-    public String generateEtag(String login) {
-        String dataToHash = "MostSecretKeyEver" + login;
-
-        String hashedData = DigestUtils.md5DigestAsHex(dataToHash.getBytes());
-
-        return "\"" + hashedData + "\"";
-    }
-
-    public boolean checkEtag(String etag, String login) {
-        String storedEtag = generateEtag(login);
-        return etag != null && etag.equals(storedEtag);
-    }
 
     public AbstractAccountDto updateAdminAccountPasswordByLogin(String login, AdminAccountDto clientDto) throws ResourceNotFoundException {
         try {

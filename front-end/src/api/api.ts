@@ -9,11 +9,21 @@ export const TIMEOUT_IN_MS = 300000
 
 const getAuthToken = () => 'Bearer ' + localStorage.getItem('token');
 
+const getEtag = () => localStorage.getItem('etag');
+
 export const DEFAULT_HEADERS = {
     Accept: 'application/json',
     'Content-type': 'application/json',
     Authorization: getAuthToken(),
     'Access-Control-Allow-Origin': '*',
+}
+
+export const ETAG_HEADERS = {
+    Accept: 'application/json',
+    'Content-type': 'application/json',
+    Authorization: getAuthToken(),
+    'Access-Control-Allow-Origin': '*',
+    'If-Match': getEtag(),
 }
 
 
@@ -28,10 +38,29 @@ export const apiWithConfig = axios.create({
     headers: DEFAULT_HEADERS,
 })
 
+export const apiWithEtag = axios.create({
+    baseURL: API_URL,
+    timeout: TIMEOUT_IN_MS,
+    headers: ETAG_HEADERS,
+})
+
 apiWithConfig.interceptors.request.use(
     (config) => {
         // Modify the request config to include the Authorization header
         config.headers.Authorization = getAuthToken();
+        return config;
+    },
+    (error) => {
+        // Handle request error
+        return Promise.reject(error);
+    }
+);
+
+apiWithEtag.interceptors.request.use(
+    (config) => {
+        // Modify the request config to include the Authorization header
+        config.headers.Authorization = getAuthToken();
+        config.headers['If-Match'] = getEtag();
         return config;
     },
     (error) => {
@@ -56,9 +85,9 @@ export const api = {
     addClientAccount: (account: Account): ApiResponseType<Account> => apiWithConfig.post("/accounts/client", account),
     addAdminAccount: (account: Account): ApiResponseType<Account> => apiWithConfig.post("/accounts/admin", account),
     addResourceManagerAccount: (account: Account): ApiResponseType<Account> => apiWithConfig.post("/accounts/resource-manager", account),
-    updateClientPassword: (account: Account | undefined, login: string): ApiResponseType<Account> => apiWithConfig.put(`/accounts/client/password/${login}`, account),
-    updateAdminPassword: (account: Account | undefined, login: string): ApiResponseType<Account> => apiWithConfig.put(`/accounts/admin/password/${login}`, account),
-    updateResourceManagerPassword: (account: Account | undefined, login: string): ApiResponseType<Account> => apiWithConfig.put(`/accounts/resource-manager/password/${login}`, account),
+    updateClientPassword: (account: Account | undefined, login: string): ApiResponseType<Account> => apiWithEtag.put(`/accounts/client/password/${login}`, account),
+    updateAdminPassword: (account: Account | undefined, login: string): ApiResponseType<Account> => apiWithEtag.put(`/accounts/admin/password/${login}`, account),
+    updateResourceManagerPassword: (account: Account | undefined, login: string): ApiResponseType<Account> => apiWithEtag.put(`/accounts/resource-manager/password/${login}`, account),
     activateAccount: (login: string): ApiResponseType<Account> => apiWithConfig.patch(`/accounts/activate/${login}`),
     deactivateAccount: (login: string): ApiResponseType<Account> => apiWithConfig.patch(`/accounts/deactivate/${login}`),
     getUserRents: (userID: string | undefined): ApiResponseType<Array<RentGet>> => apiWithConfig.get(`/rents/account-id/${userID}`),

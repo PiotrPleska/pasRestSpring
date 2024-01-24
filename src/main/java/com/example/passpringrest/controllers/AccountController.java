@@ -35,19 +35,19 @@ public class AccountController {
 
     @GetMapping(produces = "application/json")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<List<AbstractAccountDto>>  getAccounts() {
+    public ResponseEntity<List<AbstractAccountDto>> getAccounts() {
         return ResponseEntity.status(HttpStatus.OK).body(accountService.readAllAccounts());
     }
 
     @GetMapping(value = "/admins", produces = "application/json")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAnyAuthority('ROLE_RESOURCE_MANAGER')")
-    public ResponseEntity<List<AbstractAccountDto>>  getAdminAccounts() {
+    public ResponseEntity<List<AbstractAccountDto>> getAdminAccounts() {
         return ResponseEntity.status(HttpStatus.OK).body(accountService.readAdminAccounts());
     }
 
     @GetMapping(value = "/resource-managers", produces = "application/json")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAnyAuthority('ROLE_RESOURCE_MANAGER')")
-    public ResponseEntity<List<AbstractAccountDto>>  getResourceManagerAccounts() {
+    public ResponseEntity<List<AbstractAccountDto>> getResourceManagerAccounts() {
         return ResponseEntity.status(HttpStatus.OK).body(accountService.readResourceManagerAccounts());
     }
 
@@ -91,11 +91,11 @@ public class AccountController {
             @RequestBody @Valid @NotNull ClientAccountDto acc,
             @RequestHeader("If-Match") String etag) {
 
-        if (accountService.checkEtag(etag, login)) {
+        if (securityService.checkEtag(etag, login)) {
 
             AbstractAccountDto updatedAccount = accountService.updateClientAccountPasswordByLogin(login, acc);
 
-            String newEtag = accountService.generateEtag(updatedAccount.getLogin());
+            String newEtag = securityService.generateEtag(updatedAccount.getLogin());
 
             HttpHeaders headers = new HttpHeaders();
             headers.setETag(newEtag);
@@ -109,15 +109,42 @@ public class AccountController {
     @PutMapping(value = "/admin/password/{login}", produces = "application/json")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or #login == principal.username")
     public ResponseEntity<AbstractAccountDto> updateAdminAccountPasswordByLogin(@PathVariable("login") @NotNull String login,
-                                                                           @RequestBody @Valid @NotNull AdminAccountDto acc) {
-        return ResponseEntity.status(HttpStatus.OK).body(accountService.updateAdminAccountPasswordByLogin(login, acc));
+                                                                                @RequestBody @Valid @NotNull AdminAccountDto acc,
+                                                                                @RequestHeader("If-Match") String etag) {
+        if (securityService.checkEtag(etag, login)) {
+
+            AbstractAccountDto updatedAccount = accountService.updateAdminAccountPasswordByLogin(login, acc);
+
+            String newEtag = securityService.generateEtag(updatedAccount.getLogin());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setETag(newEtag);
+
+            return ResponseEntity.status(HttpStatus.OK).headers(headers).body(updatedAccount);
+        } else {
+            throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Etag is not valid");
+        }
     }
 
     @PutMapping(value = "/resource-manager/password/{login}", produces = "application/json")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or #login == principal.username")
     public ResponseEntity<AbstractAccountDto> updateAdminAccountPasswordByLogin(@PathVariable("login") @NotNull String login,
-                                                                                @RequestBody @Valid @NotNull ResourceManagerAccountDto acc) {
-        return ResponseEntity.status(HttpStatus.OK).body(accountService.updateResourceManagerAccountPasswordByLogin(login, acc));
+                                                                                @RequestBody @Valid @NotNull ResourceManagerAccountDto acc,
+                                                                                @RequestHeader("If-Match") String etag) {
+
+        if (securityService.checkEtag(etag, login)) {
+
+            AbstractAccountDto updatedAccount = accountService.updateResourceManagerAccountPasswordByLogin(login, acc);
+
+            String newEtag = securityService.generateEtag(updatedAccount.getLogin());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setETag(newEtag);
+
+            return ResponseEntity.status(HttpStatus.OK).headers(headers).body(updatedAccount);
+        } else {
+            throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Etag is not valid");
+        }
     }
 
 

@@ -38,6 +38,9 @@ export function HomePage() {
         console.log(client.login);
         console.log(client.password);
         const token = await api.logIn(client);
+        const etag = token.headers.etag;
+        localStorage.setItem('etag', etag);
+        console.log("etag: " + etag);
         const decodedToken = jwtDecode<CustomJwtPayload>(token.data);
 
         localStorage.setItem('token', token.data);

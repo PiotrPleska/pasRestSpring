@@ -10,6 +10,7 @@ import com.example.passpringrest.repositories.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -45,6 +46,19 @@ public class SecurityService {
         if(rent == null)
             return false;
         return Objects.equals(rent.getClientAccount().getLogin(), authentication.getName());
+    }
+
+    public String generateEtag(String login) {
+        String dataToHash = "MostSecretKeyEver" + login;
+
+        String hashedData = DigestUtils.md5DigestAsHex(dataToHash.getBytes());
+
+        return "\"" + hashedData + "\"";
+    }
+
+    public boolean checkEtag(String etag, String login) {
+        String storedEtag = generateEtag(login);
+        return etag != null && etag.equals(storedEtag);
     }
 
 }
