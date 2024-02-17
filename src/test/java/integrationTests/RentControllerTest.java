@@ -1,21 +1,26 @@
 package integrationTests;
 
 import com.example.passpringrest.codecs.MongoUUID;
+import com.example.passpringrest.dto.AuthenticationDto;
 import com.example.passpringrest.entities.ClientAccount;
 import com.example.passpringrest.entities.Rent;
+import com.example.passpringrest.entities.ResourceManagerAccount;
 import com.example.passpringrest.entities.Room;
 import com.example.passpringrest.repositories.AccountRepository;
 import com.example.passpringrest.repositories.RentRepository;
 import com.example.passpringrest.repositories.RoomRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
+import java.time.Year;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
@@ -31,21 +36,21 @@ public class RentControllerTest {
 
     private static RoomRepository roomRepository;
 
-    private static AccountRepository accountRepository;
+    private final String baseUrl = "https://localhost:8080/api/rents";
 
-    private final String baseUrl = "http://localhost:8080/api/rents";
+    private static String jwtToken;
 
-    ClientAccount clientAccount;
+    private static ClientAccount clientAccount;
 
-    Room room;
+    private static Room room;
 
-    Room room2;
+    private static Room room2;
 
 
     @BeforeEach
     public void clearData() {
         rentRepository = new RentRepository();
-        accountRepository = new AccountRepository();
+        AccountRepository accountRepository = new AccountRepository();
         roomRepository = new RoomRepository();
 
         rentRepository.dropRentCollection();
@@ -54,11 +59,13 @@ public class RentControllerTest {
 
         //Set activeRents to empty array
 
-        clientAccount = new ClientAccount(new MongoUUID(UUID.randomUUID()), "korwinkrul123", "$2a$10$r5tOVCplYnqf7lTX9IlSOO9LajH6ddBf9CuzbYH7/XREAZ5ALzWE.", "45032103673", true);
+        clientAccount = new ClientAccount(new MongoUUID(UUID.randomUUID()), "client", new BCryptPasswordEncoder().encode("password"), "45032103673", true);
+        ResourceManagerAccount resourceManagerAccount = new ResourceManagerAccount(new MongoUUID(UUID.randomUUID()), "manager", new BCryptPasswordEncoder().encode("password"), "45032103674", true);
         room = new Room(new MongoUUID(UUID.randomUUID()), 1, 2, 3);
         room2 = new Room(new MongoUUID(UUID.randomUUID()), 2, 2, 3);
 
         accountRepository.insertAccount(clientAccount);
+        accountRepository.insertAccount(resourceManagerAccount);
         roomRepository.insertRoom(room);
         roomRepository.insertRoom(room2);
 
@@ -70,11 +77,26 @@ public class RentControllerTest {
         rentRepository.insertRent(rentFinished);
         rentRepository.deleteRent(rentFinished);
         rentRepository.insertRent(rent);
+
+        AuthenticationDto managerDto = new AuthenticationDto("manager", "password");
+        AuthenticationDto clientDto = new AuthenticationDto("client", "password");
+
+
+        RestAssured.useRelaxedHTTPSValidation();
+        ValidatableResponse response = given()
+                .contentType("application/json")
+                .body(managerDto)
+                .when()
+                .post("https://localhost:8080/api/auth/authenticate")
+                .then()
+                .statusCode(200);
+        jwtToken = response.extract().body().asString();
     }
 
     @Test
     public void readRentsTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl)
                 .then()
@@ -89,6 +111,7 @@ public class RentControllerTest {
     public void readAllRentsWhenEmptyTest() {
         rentRepository.dropRentCollection();
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl)
                 .then()
@@ -98,6 +121,7 @@ public class RentControllerTest {
     @Test
     public void readRentByIdTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/" + rent.getRentId().getUuid().toString())
                 .then()
@@ -110,16 +134,18 @@ public class RentControllerTest {
     @Test
     public void readRentByIdWhenNotFoundTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
-                .get(baseUrl + UUID.randomUUID().toString())
+                .get(baseUrl + UUID.randomUUID())
                 .then()
-                .statusCode(404);
+                .statusCode(403);
     }
 
 
     @Test
     public void readCurrentRentsTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/current")
                 .then()
@@ -134,6 +160,7 @@ public class RentControllerTest {
     public void readCurrentRentsWhenEmptyTest() {
         rentRepository.dropRentCollection();
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/current")
                 .then()
@@ -143,6 +170,7 @@ public class RentControllerTest {
     @Test
     public void readPastRentsTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/past")
                 .then()
@@ -157,6 +185,7 @@ public class RentControllerTest {
     public void readPastRentsWhenEmptyTest() {
         rentRepository.dropRentCollection();
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/past")
                 .then()
@@ -166,6 +195,7 @@ public class RentControllerTest {
     @Test
     public void readCurrentRentsByRoomIdTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/current/room-id/" + rent.getRoom().getId().getUuid().toString())
                 .then()
@@ -179,8 +209,9 @@ public class RentControllerTest {
     @Test
     public void readCurrentRentsByRoomIdWithWrongIdTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
-                .get(baseUrl + "/current/room-id/" + UUID.randomUUID().toString())
+                .get(baseUrl + "/current/room-id/" + UUID.randomUUID())
                 .then()
                 .statusCode(404);
     }
@@ -188,6 +219,7 @@ public class RentControllerTest {
     @Test
     public void readPastRentsByRoomIdTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/past/room-id/" + rentFinished.getRoom().getId().getUuid().toString())
                 .then()
@@ -201,8 +233,9 @@ public class RentControllerTest {
     @Test
     public void readPastRentsByRoomIdWithWrongIdTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
-                .get(baseUrl + "/past/room-id/" + UUID.randomUUID().toString())
+                .get(baseUrl + "/past/room-id/" + UUID.randomUUID())
                 .then()
                 .statusCode(404);
     }
@@ -210,6 +243,7 @@ public class RentControllerTest {
     @Test
     public void readCurrentRentsByClientIdTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/current/account-id/" + rent.getClientAccount().getId().getUuid().toString())
                 .then()
@@ -223,8 +257,9 @@ public class RentControllerTest {
     @Test
     public void readCurrentRentsByClientIdWithWrongIdTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
-                .get(baseUrl + "/current/account-id/" + UUID.randomUUID().toString())
+                .get(baseUrl + "/current/account-id/" + UUID.randomUUID())
                 .then()
                 .statusCode(404);
     }
@@ -232,6 +267,7 @@ public class RentControllerTest {
     @Test
     public void readPastRentsByClientIdTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/past/account-id/" + rentFinished.getClientAccount().getId().getUuid().toString())
                 .then()
@@ -245,8 +281,9 @@ public class RentControllerTest {
     @Test
     public void readPastRentsByClientIdWithWrongIdTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
-                .get(baseUrl + "/past/account-id/" + UUID.randomUUID().toString())
+                .get(baseUrl + "/past/account-id/" + UUID.randomUUID())
                 .then()
                 .statusCode(404);
     }
@@ -255,39 +292,44 @@ public class RentControllerTest {
     public void deleteRentTest() {
 
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/" + rent.getRentId().getUuid().toString())
                 .then()
                 .statusCode(200)
                 .body(
-                        not(containsString("2023"))
+                        not(containsString(String.valueOf(Year.now().getValue())))
                 );
 
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .delete(baseUrl + "/" + rent.getRentId().getUuid().toString())
                 .then()
                 .statusCode(200);
 
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/" + rent.getRentId().getUuid().toString())
                 .then()
                 .statusCode(200)
                 .body(
-                        containsString("2023")
+                        containsString(String.valueOf(Year.now().getValue()))
                 );
     }
 
     @Test
     public void deleteFinishedRentTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .delete(baseUrl + "/" + rentFinished.getRentId().getUuid().toString())
                 .then()
                 .statusCode(409);
 
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl)
                 .then()
@@ -301,31 +343,33 @@ public class RentControllerTest {
     @Test
     public void deleteRentWhenNotFoundTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
-                .delete(baseUrl + UUID.randomUUID().toString())
+                .delete(baseUrl + UUID.randomUUID())
                 .then()
-                .statusCode(404);
+                .statusCode(403);
     }
 
     @Test
     public void createRentTest() throws JSONException {
-        Response response = RestAssured.get(baseUrl);
+        Response response = RestAssured.given().header("Authorization", "Bearer " + jwtToken).get(baseUrl);
         int size = response.jsonPath().getList("$").size();
-
+        Room newRoom = new Room(new MongoUUID(UUID.randomUUID()), 3, 2, 3);
+        roomRepository.insertRoom(newRoom);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("accountId", clientAccount.getId().getUuid().toString());
-        jsonObject.put("roomId", room.getId().getUuid().toString());
-        jsonObject.put("rentStartDate", "30-11-2023 14:30:00");
-
+        jsonObject.put("roomId", newRoom.getId().getUuid().toString());
+        jsonObject.put("rentStartDate", "2024-02-18T20:52:00+01");
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(jsonObject.toString())
                 .when()
                 .post(baseUrl)
                 .then()
                 .statusCode(201);
 
-        response = RestAssured.get(baseUrl);
+        response = RestAssured.given().header("Authorization", "Bearer " + jwtToken).get(baseUrl);
         Assertions.assertEquals(size + 1, response.jsonPath().getList("$").size());
     }
 
@@ -338,11 +382,12 @@ public class RentControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(jsonObject.toString())
                 .when()
                 .post(baseUrl)
                 .then()
-                .statusCode(404);
+                .statusCode(403);
     }
 
     @Test
@@ -354,11 +399,12 @@ public class RentControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(jsonObject.toString())
                 .when()
                 .post(baseUrl)
                 .then()
-                .statusCode(404);
+                .statusCode(403);
     }
 
     @Test
@@ -370,10 +416,11 @@ public class RentControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(jsonObject.toString())
                 .when()
                 .post(baseUrl)
                 .then()
-                .statusCode(409);
+                .statusCode(403);
     }
 }

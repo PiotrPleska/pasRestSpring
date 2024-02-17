@@ -63,7 +63,7 @@ export function RentAddForm() {
                 rentStartDate: selectedDate ? format(selectedDate, "yyyy-MM-dd'T'HH:mm:ssX") : "",
                 roomId: data?.roomId ?? '',
             };
-
+            console.log(rentData);
             await api.addRent(rentData).then((r) => {
                 if (r.status === 200) {
                     alert("Rent added successfully!")
