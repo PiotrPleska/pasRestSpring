@@ -1,4 +1,4 @@
-package com.example.passpringrest;
+package integrationTests;
 
 import com.example.passpringrest.codecs.MongoUUID;
 import com.example.passpringrest.entities.ClientAccount;
