@@ -1,21 +1,24 @@
-package com.example.passpringrest;
+package integrationTests;
 
 import com.example.passpringrest.codecs.MongoUUID;
+import com.example.passpringrest.dto.AuthenticationDto;
 import com.example.passpringrest.entities.AdminAccount;
 import com.example.passpringrest.entities.ClientAccount;
 import com.example.passpringrest.entities.ResourceManagerAccount;
 import com.example.passpringrest.repositories.AccountRepository;
+import io.restassured.RestAssured;
+import io.restassured.response.ValidatableResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 
 public class AccoutControllerTest {
 
@@ -27,23 +30,55 @@ public class AccoutControllerTest {
 
     private static AccountRepository accountRepository;
 
-    private final String baseUrl = "http://localhost:8080/api/accounts";
+    private final String baseUrl = "https://localhost:8080/api/accounts";
+
+    private static String jwtToken;
+
+    private static String jwtTokenClient;
+
+    private static String eTagClient;
+
+
 
     @BeforeEach
     public void clearData() {
         accountRepository = new AccountRepository();
-        clientAccount = new ClientAccount(new MongoUUID(UUID.randomUUID()), "korwinkrul123", "haslo123", "45032103673", true);
-        adminAccount = new AdminAccount(new MongoUUID(UUID.randomUUID()), "admin123", "haslo123", "45032103674", true);
-        resourceManagerAccount = new ResourceManagerAccount(new MongoUUID(UUID.randomUUID()), "manager123", "haslo123", "45032103675", true);
         accountRepository.dropAccountCollection();
+        clientAccount = new ClientAccount(new MongoUUID(UUID.randomUUID()), "client", new BCryptPasswordEncoder().encode("password"), "45032153673", true);
+        adminAccount = new AdminAccount(new MongoUUID(UUID.randomUUID()), "admin", new BCryptPasswordEncoder().encode("password"), "45031103674", true);
+        resourceManagerAccount = new ResourceManagerAccount(new MongoUUID(UUID.randomUUID()), "manager", new BCryptPasswordEncoder().encode("password"), "45034103675", true);
         accountRepository.insertAccount(clientAccount);
         accountRepository.insertAccount(adminAccount);
         accountRepository.insertAccount(resourceManagerAccount);
+        AuthenticationDto adminDto = new AuthenticationDto("admin", "password");
+        AuthenticationDto clientDto = new AuthenticationDto("client", "password");
+
+        RestAssured.useRelaxedHTTPSValidation();
+        ValidatableResponse response = given()
+                .contentType("application/json")
+                .body(adminDto)
+                .when()
+                .post("https://localhost:8080/api/auth/authenticate")
+                .then()
+                .statusCode(200);
+        jwtToken = response.extract().body().asString();
+
+        ValidatableResponse responseClient = given()
+                .contentType("application/json")
+                .body(clientDto)
+                .when()
+                .post("https://localhost:8080/api/auth/authenticate")
+                .then()
+                .statusCode(200);
+        jwtTokenClient = responseClient.extract().body().asString();
+        eTagClient = responseClient.extract().header("ETag");
+
     }
 
     @Test
     public void readAccountsTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl)
                 .then()
@@ -58,6 +93,7 @@ public class AccoutControllerTest {
     @Test
     public void readAdminAccountsTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/admins")
                 .then()
@@ -72,6 +108,7 @@ public class AccoutControllerTest {
     @Test
     public void readResourceManagerAccountsTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/resource-managers")
                 .then()
@@ -86,6 +123,7 @@ public class AccoutControllerTest {
     @Test
     public void readClientAccountsTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/clients")
                 .then()
@@ -100,6 +138,7 @@ public class AccoutControllerTest {
     @Test
     public void readAccountByIdTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/" + clientAccount.getId())
                 .then()
@@ -112,6 +151,7 @@ public class AccoutControllerTest {
     @Test
     public void readAccountByInvalidIdTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/" + "123")
                 .then()
@@ -121,6 +161,7 @@ public class AccoutControllerTest {
     @Test
     public void readAccountByPersonalIdTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/personal-id/" + clientAccount.getPersonalId())
                 .then()
@@ -133,6 +174,7 @@ public class AccoutControllerTest {
     @Test
     public void readAccountByInvalidPersonalIdTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/personal-id/" + "1234567890")
                 .then()
@@ -142,6 +184,7 @@ public class AccoutControllerTest {
     @Test
     public void readAccountByLoginTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/login/" + clientAccount.getLogin())
                 .then()
@@ -154,6 +197,7 @@ public class AccoutControllerTest {
     @Test
     public void readAccountByInvalidLoginTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/login/" + "123")
                 .then()
@@ -163,22 +207,24 @@ public class AccoutControllerTest {
     @Test
     public void readAccountsByPartOfLoginTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
-                .get(baseUrl + "/part-of-login/" + "korwin")
+                .get(baseUrl + "/part-of-login/" + "adm")
                 .then()
                 .statusCode(200)
                 .body(
-                        containsString(clientAccount.getLogin())
+                        containsString(adminAccount.getLogin())
                 );
     }
 
     @Test
     public void readAccountsByInvalidPartOfLoginTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/part-of-login/" + "####")
                 .then()
-                .statusCode(404);
+                .statusCode(403);
     }
 
     @Test
@@ -190,6 +236,8 @@ public class AccoutControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtTokenClient)
+                .header("If-Match", eTagClient)
                 .body(json.toString())
                 .when()
                 .put(baseUrl + "/client/password/" + clientAccount.getLogin())
@@ -207,10 +255,11 @@ public class AccoutControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
                 .put(baseUrl + "/password/" + "123")
-                .then().statusCode(404);
+                .then().statusCode(403);
     }
 
     @Test
@@ -218,26 +267,27 @@ public class AccoutControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .patch(baseUrl + "/deactivate/" + clientAccount.getLogin())
                 .then().statusCode(200);
 
         given()
                 .when()
+                .header("Authorization", "Bearer " + jwtToken)
                 .get(baseUrl + "/" + clientAccount.getId())
                 .then()
                 .statusCode(200)
-                .body(
-                        not(containsString("true"))
-                );
-
+                .body("active", equalTo(false));
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .patch(baseUrl + "/activate/" + clientAccount.getLogin())
                 .then().statusCode(200);
 
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/" + clientAccount.getId())
                 .then()
@@ -251,6 +301,7 @@ public class AccoutControllerTest {
     public void activateAccountWithBadLoginTest() {
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .patch(baseUrl + "/activate/" + "123")
                 .then().statusCode(404);
@@ -259,6 +310,7 @@ public class AccoutControllerTest {
     @Test
     public void deactivateAccountTest() {
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/" + clientAccount.getId())
                 .then()
@@ -269,11 +321,13 @@ public class AccoutControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .patch(baseUrl + "/deactivate/" + clientAccount.getLogin())
                 .then().statusCode(200);
 
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/" + clientAccount.getId())
                 .then()
@@ -287,6 +341,7 @@ public class AccoutControllerTest {
     public void deactivateAccountWithBadLoginTest() {
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .patch(baseUrl + "/deactivate/" + "123")
                 .then().statusCode(404);
@@ -301,6 +356,7 @@ public class AccoutControllerTest {
         json.put("personalId", "45032103676");
 
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/login/" + "nowyLogin")
                 .then()
@@ -308,12 +364,14 @@ public class AccoutControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
                 .post(baseUrl + "/client")
                 .then().statusCode(201);
 
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/login/" + "nowyLogin")
                 .then()
@@ -333,6 +391,7 @@ public class AccoutControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
                 .post(baseUrl + "/client")
@@ -349,6 +408,7 @@ public class AccoutControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
                 .post(baseUrl + "/client")
@@ -364,6 +424,7 @@ public class AccoutControllerTest {
         json.put("personalId", "45032103677");
 
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/login/" + "nowyLogin2")
                 .then()
@@ -371,12 +432,14 @@ public class AccoutControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
                 .post(baseUrl + "/admin")
                 .then().statusCode(201);
 
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/login/" + "nowyLogin2")
                 .then()
@@ -397,10 +460,11 @@ public class AccoutControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
                 .post(baseUrl + "/admin")
-                .then().statusCode(409);
+                .then().statusCode(403);
     }
 
     @Test
@@ -413,6 +477,7 @@ public class AccoutControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
                 .post(baseUrl + "/admin")
@@ -428,6 +493,7 @@ public class AccoutControllerTest {
         json.put("personalId", "45032103678");
 
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/login/" + "nowyLogin3")
                 .then()
@@ -435,12 +501,14 @@ public class AccoutControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
                 .post(baseUrl + "/resource-manager")
                 .then().statusCode(201);
 
         given()
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/login/" + "nowyLogin3")
                 .then()
@@ -461,6 +529,7 @@ public class AccoutControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
                 .post(baseUrl + "/resource-manager")
@@ -480,10 +549,11 @@ public class AccoutControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
                 .post(baseUrl + "/client")
-                .then().statusCode(400);
+                .then().statusCode(403);
     }
 
 }

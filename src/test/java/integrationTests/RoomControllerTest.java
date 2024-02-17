@@ -1,15 +1,20 @@
-package com.example.passpringrest;
+package integrationTests;
 
 import com.example.passpringrest.codecs.MongoUUID;
+import com.example.passpringrest.dto.AuthenticationDto;
+import com.example.passpringrest.entities.ResourceManagerAccount;
 import com.example.passpringrest.entities.Room;
+import com.example.passpringrest.repositories.AccountRepository;
 import com.example.passpringrest.repositories.RoomRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
 import java.util.UUID;
@@ -23,20 +28,36 @@ public class RoomControllerTest {
     private static Room room;
     private static RoomRepository roomRepository;
 
-    private static final String baseUrl = "http://localhost:8080/api/rooms";
+    private static final String baseUrl = "https://localhost:8080/api/rooms";
+
+    private static String jwtToken;
 
     @BeforeEach
     public void clearData() {
         roomRepository = new RoomRepository();
         roomRepository.dropRoomCollection();
+        AccountRepository accountRepository = new AccountRepository();
+        accountRepository.dropAccountCollection();
         room = new Room(new MongoUUID(UUID.randomUUID()), 1, 2, 3);
+        ResourceManagerAccount resourceManagerAccount = new ResourceManagerAccount("login", new BCryptPasswordEncoder().encode("password"), "12345678901", true);
+        accountRepository.insertAccount(resourceManagerAccount);
+        AuthenticationDto authenticationDto = new AuthenticationDto("login", "password");
+        RestAssured.useRelaxedHTTPSValidation();
+        ValidatableResponse response = given()
+                .contentType("application/json")
+                .body(authenticationDto)
+                .when()
+                .post("https://localhost:8080/api/auth/authenticate")
+                .then()
+                .statusCode(200);
+        jwtToken = response.extract().body().asString();
         roomRepository.insertRoom(room);
     }
 
 
     @Test
     public void readRoomsTest() {
-        Response response = RestAssured.get(baseUrl);
+        Response response = RestAssured.given().header("Authorization", "Bearer " + jwtToken).get(baseUrl);
         Assertions.assertEquals(200, response.getStatusCode());
         Assertions.assertEquals("[1]", response.jsonPath().getString("roomNumber"));
         Assertions.assertEquals("[2]", response.jsonPath().getString("roomCapacity"));
@@ -46,13 +67,13 @@ public class RoomControllerTest {
     @Test
     public void readRoomsNegativeTest() {
         roomRepository.dropRoomCollection();
-        Response response = RestAssured.get(baseUrl);
+        Response response = RestAssured.given().header("Authorization", "Bearer " + jwtToken).get(baseUrl);
         Assertions.assertEquals(404, response.getStatusCode());
     }
 
     @Test
     public void readRoomByIdTest() {
-        Response response = RestAssured.get(baseUrl + "/" + room.getId());
+        Response response = RestAssured.given().header("Authorization", "Bearer " + jwtToken).get(baseUrl + "/" + room.getId());
         Assertions.assertEquals(200, response.getStatusCode());
         Assertions.assertEquals(1, response.jsonPath().getInt("roomNumber"));
         Assertions.assertEquals(2, response.jsonPath().getInt("roomCapacity"));
@@ -61,14 +82,14 @@ public class RoomControllerTest {
 
     @Test
     public void readRoomByIdNegativeTest() {
-        Response response = RestAssured.get(baseUrl + "/" + UUID.randomUUID());
+        Response response = RestAssured.given().header("Authorization", "Bearer " + jwtToken).get(baseUrl + "/" + UUID.randomUUID());
         Assertions.assertEquals(404, response.getStatusCode());
     }
 
     @Test
     public void readRoomByRoomNumberNegativeTest() {
-        Response response = RestAssured.get(baseUrl + "/room-number/" + 99);
-        Response response2 = RestAssured.get(baseUrl + "/room-number/" + 1);
+        Response response = RestAssured.given().header("Authorization", "Bearer " + jwtToken).get(baseUrl + "/room-number/" + 99);
+        Response response2 = RestAssured.given().header("Authorization", "Bearer " + jwtToken).get(baseUrl + "/room-number/" + 1);
         Assertions.assertEquals(200, response2.getStatusCode());
         Assertions.assertEquals(404, response.getStatusCode());
 
@@ -76,7 +97,7 @@ public class RoomControllerTest {
 
     @Test
     public void readRoomByRoomNumberTest() {
-        Response response = RestAssured.get(baseUrl + "/room-number/" + room.getRoomNumber());
+        Response response = RestAssured.given().header("Authorization", "Bearer " + jwtToken).get(baseUrl + "/room-number/" + room.getRoomNumber());
         Assertions.assertEquals(200, response.getStatusCode());
         Assertions.assertEquals(1, response.jsonPath().getInt("roomNumber"));
         Assertions.assertEquals(2, response.jsonPath().getInt("roomCapacity"));
@@ -92,6 +113,7 @@ public class RoomControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/room-number/" + 1)
                 .then()
@@ -102,12 +124,13 @@ public class RoomControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
                 .put(baseUrl + "/price/1")
                 .then().statusCode(200);
 
-        Response response = RestAssured.get(baseUrl + "/room-number/1");
+        Response response = RestAssured.given().header("Authorization", "Bearer " + jwtToken).get(baseUrl + "/room-number/1");
         Assertions.assertEquals(200, response.getStatusCode());
         Assertions.assertEquals(10.0, response.jsonPath().getDouble("basePrice"));
     }
@@ -122,6 +145,7 @@ public class RoomControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get(baseUrl + "/room-number/" + 1)
                 .then()
@@ -132,21 +156,22 @@ public class RoomControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
                 .put(baseUrl + "/capacity/1")
                 .then().statusCode(200);
 
-        Response response = RestAssured.get(baseUrl + "/room-number/1");
+        Response response = RestAssured.given().header("Authorization", "Bearer " + jwtToken).get(baseUrl + "/room-number/1");
         Assertions.assertEquals(200, response.getStatusCode());
         Assertions.assertEquals(5, response.jsonPath().getInt("roomCapacity"));
     }
 
     @Test
     public void deleteRoomTest() {
-        Response response = RestAssured.delete(baseUrl + "/" + room.getRoomNumber());
+        Response response = RestAssured.given().header("Authorization", "Bearer " + jwtToken).delete(baseUrl + "/" + room.getRoomNumber());
         Assertions.assertEquals(200, response.getStatusCode());
-        Response response2 = RestAssured.get(baseUrl + "/room-number/" + room.getRoomNumber());
+        Response response2 = RestAssured.given().header("Authorization", "Bearer " + jwtToken).get(baseUrl + "/room-number/" + room.getRoomNumber());
         Assertions.assertEquals(404, response2.getStatusCode());
     }
 
@@ -160,6 +185,7 @@ public class RoomControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
                 .post(baseUrl)
@@ -167,12 +193,13 @@ public class RoomControllerTest {
                 .statusCode(201);
 
 
-        Response response = RestAssured.get(baseUrl + "/room-number/100");
+        Response response = RestAssured.given().header("Authorization", "Bearer " + jwtToken).get(baseUrl + "/room-number/100");
         Assertions.assertEquals(200, response.getStatusCode());
         Assertions.assertEquals(100, response.jsonPath().getInt("roomNumber"));
         Assertions.assertEquals(3, response.jsonPath().getInt("roomCapacity"));
         Assertions.assertEquals(4.0, response.jsonPath().getDouble("basePrice"));
     }
+
     @Test
     public void updateRoomPriceNotFoundTest() throws JSONException {
         JSONObject json = new JSONObject();
@@ -182,6 +209,7 @@ public class RoomControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
                 .put(baseUrl + "/price/10")
@@ -197,10 +225,11 @@ public class RoomControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
                 .put(baseUrl + "/price/1")
-                .then().statusCode(400);
+                .then().statusCode(403);
     }
 
     @Test
@@ -212,10 +241,11 @@ public class RoomControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
                 .put(baseUrl + "/price/1")
-                .then().statusCode(400);
+                .then().statusCode(403);
     }
 
     @Test
@@ -227,10 +257,11 @@ public class RoomControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
-                .post(baseUrl + "/add")
-                .then().statusCode(405);
+                .post(baseUrl)
+                .then().statusCode(409);
     }
 
     @Test
@@ -242,15 +273,16 @@ public class RoomControllerTest {
 
         given()
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwtToken)
                 .body(json.toString())
                 .when()
-                .post(baseUrl + "/add")
-                .then().statusCode(405);
+                .post(baseUrl)
+                .then().statusCode(403);
     }
 
     @Test
     public void deleteRoomNegativeTest() {
-        Response response = RestAssured.delete(baseUrl + "/" + 99);
+        Response response = RestAssured.given().header("Authorization", "Bearer " + jwtToken).delete(baseUrl + "/" + 99);
         Assertions.assertEquals(404, response.getStatusCode());
     }
 
@@ -259,7 +291,7 @@ public class RoomControllerTest {
         Room roomRented = new Room(new MongoUUID(UUID.randomUUID()), 50, 2, 3);
         roomRented.setIsRented(1);
         roomRepository.insertRoom(roomRented);
-        Response response = RestAssured.delete(baseUrl + "/" + 50);
+        Response response = RestAssured.given().header("Authorization", "Bearer " + jwtToken).delete(baseUrl + "/" + 50);
         Assertions.assertEquals(409, response.getStatusCode());
     }
 

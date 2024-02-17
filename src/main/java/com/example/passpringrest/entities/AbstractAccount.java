@@ -3,10 +3,14 @@ package com.example.passpringrest.entities;
 import com.example.passpringrest.codecs.MongoUUID;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.UUID;
 
 
-
-public abstract class AbstractAccount {
+public abstract class AbstractAccount implements UserDetails {
 
     @BsonProperty("_id")
     private MongoUUID id;
@@ -28,6 +32,7 @@ public abstract class AbstractAccount {
 
 
     public AbstractAccount(String login, String password, String personalId, boolean active) {
+        this.id = new MongoUUID(UUID.randomUUID());
         this.login = login;
         this.password = password;
         this.personalId = personalId;
@@ -63,8 +68,21 @@ public abstract class AbstractAccount {
         this.login = login;
     }
 
+    @Override
+    public abstract Collection<? extends GrantedAuthority> getAuthorities();
+
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return login;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return active;
     }
 
     public void setPassword(String password) {

@@ -50,7 +50,7 @@ export function UserAddForm() {
 
     return (
         <>
-            <Link to="/">Home</Link>
+            <Link to="/usersList">User List</Link>
             <h1>Add User</h1>
             <form className="form-label" onSubmit={handleSubmit((data) => handleOpenModal(data))}>
                 <label htmlFor="login">Login</label>

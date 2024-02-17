@@ -2,8 +2,11 @@ import { Link, useParams } from "react-router-dom";
 import { api } from "../api/api.ts";
 import { useEffect, useState } from "react";
 import { RentGet } from "../types/Rent.ts";
+import {AccountTypeEnum} from "../enums/AccountType.enum.ts";
+import {useUserContext} from "../Context/UserProvider.tsx";
 
 const ClientRents = () => {
+    const {user} = useUserContext();
     const { accountId } = useParams<{ accountId: string }>();
     const [rents, setRents] = useState<Array<RentGet>>([]);
     const [showModal, setShowModal] = useState(false);
@@ -48,7 +51,8 @@ const ClientRents = () => {
 
     return (
         <>
-            <Link to="/">Home</Link>
+            {user?.accountType === AccountTypeEnum.CLIENT && <Link to="/Home">User Home</Link>}
+            {user?.accountType === AccountTypeEnum.RESOURCE_MANAGER && <Link to="/UsersList">Users List</Link>}
             <br />
             {rents.length > 0 && (
                 <table className="table table-dark">

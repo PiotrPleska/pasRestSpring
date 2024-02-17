@@ -6,8 +6,11 @@ import {api} from "../api/api.ts";
 import {Link, useParams} from "react-router-dom";
 import {Room} from "../types/Room.ts";
 import {useEffect, useState} from "react";
+import {useUserContext} from "../Context/UserProvider.tsx";
+import {AccountTypeEnum} from "../enums/AccountType.enum.ts";
 
 export function RentAddForm() {
+    const {user} = useUserContext();
     const {accountId} = useParams<{ accountId: string }>();
     const {
         register,
@@ -60,7 +63,7 @@ export function RentAddForm() {
                 rentStartDate: selectedDate ? format(selectedDate, "yyyy-MM-dd'T'HH:mm:ssX") : "",
                 roomId: data?.roomId ?? '',
             };
-
+            console.log(rentData);
             await api.addRent(rentData).then((r) => {
                 if (r.status === 200) {
                     alert("Rent added successfully!")
@@ -77,7 +80,8 @@ export function RentAddForm() {
 
     return (
         <>
-            <Link to="/">Home</Link>
+            {user?.accountType === AccountTypeEnum.CLIENT && <Link to="/Home">User Home</Link>}
+            {user?.accountType === AccountTypeEnum.RESOURCE_MANAGER && <Link to="/UsersList">Users List</Link>}
             <h1>Add Rent</h1>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <label htmlFor="roomId">Select Room</label>

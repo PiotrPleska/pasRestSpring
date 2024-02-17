@@ -36,12 +36,17 @@ export const UpdatePassword = ({user, setUser, accountType}: UpdatePasswordProps
 
     const handleConfirmSubmit = () => {
         if (user) {
+            const updatedUser = {
+                login: user.login,
+                password: password,
+                personalId: user.personalId,
+            };
             if (accountType == 'client')
-                api.updateClientPassword(user, user?.login ?? "").then((r) => console.log(r));
+                api.updateClientPassword(updatedUser, user?.login ?? "").then((r) => console.log(r));
             else if (accountType == 'admin')
-                api.updateAdminPassword(user, user?.login ?? "").then((r) => console.log(r));
+                api.updateAdminPassword(updatedUser, user?.login ?? "").then((r) => console.log(r));
             else if (accountType == 'resourceManager')
-                api.updateResourceManagerPassword(user, user?.login ?? "").then((r) => console.log(r));
+                api.updateResourceManagerPassword(updatedUser, user?.login ?? "").then((r) => console.log(r));
             handleCloseModal();
         }
     };
