@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
 
-@SpringBootTest(classes = com.example.passpringrest.PasSpringRestApplication.class)
+@SpringBootTest(classes = com.example.passpringrest.PasSpringRestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class RoomControllerTest {
 
     private static Room room;
@@ -35,7 +35,7 @@ public class RoomControllerTest {
     @Autowired
     private AccountRepository accountRepository;
 
-    private static final String baseUrl = "http://localhost:8080/api/rooms";
+    private static final String baseUrl = "https://localhost:8080/api/rooms";
 
     private static String jwtToken;
 
