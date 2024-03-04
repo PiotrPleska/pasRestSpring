@@ -1,85 +1,31 @@
 version: '3.8'
+
 services:
-  mongo_1:
-      build:
-        context: .
-        dockerfile: Dockerfile
-      image: mongo:6-jammy
-      container_name: mongodb1
-      hostname: mongodb1
-      networks:
-        - mongonet
-      ports:
-        - "27017:27017"
-      environment:
-         - MONGO_INITDB_ROOT_USERNAME=admin
-         - MONGO_INITDB_ROOT_PASSWORD=adminpassword
-      command: --config /etc/mongod.conf --port 27017 --replSet replica_set_single
-      healthcheck:
-        test: [ "CMD", "mongosh", "--port", "27017","--eval", "db.adminCommand('ping')" ]
-        interval: 10s
-        timeout: 2s
-        retries: 5
 
-  mongo_2:
-        build:
-          context: .
-          dockerfile: Dockerfile
-        image: mongo:6-jammy
-        container_name: mongodb2
-        hostname: mongodb2
-        networks:
-            - mongonet
-        ports:
-            - "27018:27018"
-        environment:
-          - MONGO_INITDB_ROOT_USERNAME=admin
-          - MONGO_INITDB_ROOT_PASSWORD=adminpassword
-        command: --config /etc/mongod.conf --port 27018 --replSet replica_set_single
-        healthcheck:
-            test: [ "CMD", "mongosh", "--port", "27018","--eval", "db.adminCommand('ping')" ]
-            interval: 10s
-            timeout: 2s
-            retries: 5
+  db_pg:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_DB: tks
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
 
-  mongo_3:
-        build:
-          context: .
-          dockerfile: Dockerfile
-        image: mongo:6-jammy
-        container_name: mongodb3
-        hostname: mongodb3
-        networks:
-            - mongonet
-        ports:
-            - "27019:27019"
-        environment:
-          - MONGO_INITDB_ROOT_USERNAME=admin
-          - MONGO_INITDB_ROOT_PASSWORD=adminpassword
-        command: --config /etc/mongod.conf --port 27019 --replSet replica_set_single
-        healthcheck:
-            test: [ "CMD", "mongosh", "--port", "27019","--eval", "db.adminCommand('ping')" ]
-            interval: 10s
-            timeout: 2s
-            retries: 5
+    ports:
+      - 5432:5432
+    volumes:
+      - pg:/var/lib/postgresql/data
 
-  mongoinit:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: mongo:6-jammy
-    hostname: mongodbinit
-    container_name: mongodbinit
-    networks:
-      - mongonet
-    depends_on:
-      mongo_1:
-        condition: service_healthy
-      mongo_2:
-        condition: service_healthy
-      mongo_3:
-        condition: service_healthy
-    command: mongosh --host mongodb1 --port 27017 --username admin --password adminpassword --file /scripts/initReplicaSet.js
-networks:
-  mongonet:
-    driver: bridge
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8081"
+    command:
+      - 'php'
+      - '-S'
+      - '[::]:8081'
+      - '-t'
+      - '/var/www/html'
+
+volumes:
+  pg:

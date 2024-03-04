@@ -1,8 +1,7 @@
 package com.example.passpringrest.services;
 
 import com.example.passpringrest.dto.*;
-import com.example.passpringrest.entities.AbstractAccount;
-import com.example.passpringrest.entities.ClientAccount;
+import com.example.passpringrest.exceptions.ResourceNotFoundException;
 import com.example.passpringrest.repositories.AccountRepository;
 import com.example.passpringrest.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +45,7 @@ public class AuthenticationService {
                         request.getPassword()
                 )
         );
-        var user = accountRepository.readAccountByLogin(request.getLogin());
+        var user = accountRepository.findByLogin(request.getLogin()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return jwtService.generateToken(user);
     }
 }

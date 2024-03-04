@@ -1,7 +1,6 @@
 package com.example.passpringrest.services;
 
 
-import com.example.passpringrest.codecs.MongoUUID;
 import com.example.passpringrest.entities.AbstractAccount;
 import com.example.passpringrest.entities.Rent;
 import com.example.passpringrest.repositories.AccountRepository;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -21,31 +21,27 @@ public class SecurityService {
 
     private final RentRepository rentRepository;
 
-
-    private final RoomRepository roomRepository;
-
-
     private final AccountRepository accountRepository;
 
     public boolean canAccessByAccountId(Authentication authentication, String userId) {
-        AbstractAccount account = accountRepository.readAccountByLogin(authentication.getName());
-        if(account == null)
+        Optional<AbstractAccount> account = accountRepository.findByLogin(authentication.getName());
+        if (account.isEmpty())
             return false;
-        return Objects.equals(account.getId().getUuid().toString(), userId);
+        return Objects.equals(account.get().getId().toString(), userId);
     }
 
     public boolean canAccessByPersonalId(Authentication authentication, String personalId) {
-        AbstractAccount account = accountRepository.readAccountByLogin(authentication.getName());
-        if(account == null)
+        Optional<AbstractAccount> account = accountRepository.findByLogin(authentication.getName());
+        if (account.isEmpty())
             return false;
-        return Objects.equals(account.getPersonalId(), personalId);
+        return Objects.equals(account.get().getPersonalId(), personalId);
     }
 
     public boolean canAccessRentByRentId(Authentication authentication, String rentId) {
-        Rent rent = rentRepository.readRentById(new MongoUUID(UUID.fromString(rentId)));
-        if(rent == null)
+        Optional<Rent> rent = rentRepository.findById(UUID.fromString(rentId));
+        if (rent.isEmpty())
             return false;
-        return Objects.equals(rent.getClientAccount().getLogin(), authentication.getName());
+        return Objects.equals(rent.get().getClientAccount().getLogin(), authentication.getName());
     }
 
     public String generateEtag(String login) {

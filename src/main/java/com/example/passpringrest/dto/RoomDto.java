@@ -6,9 +6,13 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.UUID;
 
+@Getter
+@Setter
 public class RoomDto {
 
     @JsonProperty("id")
@@ -32,7 +36,7 @@ public class RoomDto {
     private double basePrice;
 
     @JsonProperty("isRented")
-    private int isRented;
+    private boolean isRented;
 
     public RoomDto() {
     }
@@ -46,7 +50,7 @@ public class RoomDto {
         this.basePrice = basePrice;
     }
 
-    public RoomDto(UUID id, int roomNumber, int roomCapacity, double basePrice, int isRented) {
+    public RoomDto(UUID id, int roomNumber, int roomCapacity, double basePrice, boolean isRented) {
         this.id = id;
         this.roomNumber = roomNumber;
         this.roomCapacity = roomCapacity;
@@ -54,43 +58,4 @@ public class RoomDto {
         this.isRented = isRented;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public int getRoomNumber() {
-        return roomNumber;
-    }
-
-    public void setRoomNumber(int roomNumber) {
-        this.roomNumber = roomNumber;
-    }
-
-    public int getRoomCapacity() {
-        return roomCapacity;
-    }
-
-    public void setRoomCapacity(int roomCapacity) {
-        this.roomCapacity = roomCapacity;
-    }
-
-    public double getBasePrice() {
-        return basePrice;
-    }
-
-    public void setBasePrice(double basePrice) {
-        this.basePrice = basePrice;
-    }
-
-    public int getIsRented() {
-        return isRented;
-    }
-
-    public void setIsRented(int isRented) {
-        this.isRented = isRented;
-    }
 }

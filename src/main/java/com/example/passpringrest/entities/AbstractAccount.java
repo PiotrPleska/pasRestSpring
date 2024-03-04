@@ -1,79 +1,66 @@
 package com.example.passpringrest.entities;
 
-import com.example.passpringrest.codecs.MongoUUID;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonProperty;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.UUID;
 
-
+@Getter
+@Setter
+@Entity(name = "account")
+@NoArgsConstructor
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name="client_type")
 public abstract class AbstractAccount implements UserDetails {
 
-    @BsonProperty("_id")
-    private MongoUUID id;
+    public AbstractAccount(String login, String password, String personalId, boolean active) {
+        this.login = login;
+        this.password = password;
+        this.personalId = personalId;
+        this.active = active;
+    }
 
+    public AbstractAccount(UUID id, String login, String password, String personalId, boolean active) {
+        this.id = id;
+        this.login = login;
+        this.password = password;
+        this.personalId = personalId;
+        this.active = active;
+    }
 
-    @BsonProperty("login")
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
+
+    @Column(name = "login", unique = true, nullable = false)
     private String login;
 
 
-    @BsonProperty("password")
+    @Column(name = "password", nullable = false)
     private String password;
 
 
-    @BsonProperty("personalId")
+    @Column(name = "personal_id", unique = true, nullable = false)
     private String personalId;
 
-    @BsonProperty("active")
+
+    @Column(name = "active", nullable = false)
     private boolean active = true;
 
+    @Version
+    private long version;
 
-    public AbstractAccount(String login, String password, String personalId, boolean active) {
-        this.id = new MongoUUID(UUID.randomUUID());
-        this.login = login;
-        this.password = password;
-        this.personalId = personalId;
-        this.active = active;
-    }
-
-    @BsonCreator
-    public AbstractAccount(MongoUUID id, String login, String password, String personalId, boolean active) {
-        this.id = id;
-        this.login = login;
-        this.password = password;
-        this.personalId = personalId;
-        this.active = active;
-    }
-
-    public AbstractAccount() {
-
-    }
-
-    public MongoUUID getId() {
-        return id;
-    }
-
-    public void setId(MongoUUID id) {
-        this.id = id;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
 
     @Override
     public abstract Collection<? extends GrantedAuthority> getAuthorities();
 
-    public String getPassword() {
-        return password;
-    }
 
     @Override
     public String getUsername() {
@@ -85,30 +72,13 @@ public abstract class AbstractAccount implements UserDetails {
         return active;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getPersonalId() {
-        return personalId;
-    }
-
-    public void setPersonalId(String personalId) {
-        this.personalId = personalId;
-    }
-
 
     public String toString() {
         return String.format("%s %s (%s)", login, password, personalId);
     }
 
-
     public boolean getActive() {
         return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
     }
 
 }

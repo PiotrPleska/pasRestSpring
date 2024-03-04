@@ -1,32 +1,36 @@
 package com.example.passpringrest.entities;
 
-import com.example.passpringrest.codecs.MongoUUID;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonDiscriminator;
-import org.bson.codecs.pojo.annotations.BsonProperty;
+
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 
-@BsonDiscriminator(key = "_clazz", value = "ClientAccount")
+@Getter
+@Setter
+@NoArgsConstructor
+@Entity
+@DiscriminatorValue("client")
+@Access(AccessType.FIELD)
 public class ClientAccount extends AbstractAccount {
 
     public ClientAccount(String login, String password, String personalId, boolean active) {
         super(login, password, personalId, active);
     }
 
-
-    @BsonCreator
-    public ClientAccount(@BsonProperty("id") MongoUUID id, @BsonProperty("login") String login, @BsonProperty("password") String password,
-                         @BsonProperty("personalId") String personalId, @BsonProperty("active") boolean active) {
+    public ClientAccount(UUID id, String login, String password, String personalId, boolean active) {
         super(id, login, password, personalId, active);
-    }
-
-    public ClientAccount() {
-
     }
 
     @Override

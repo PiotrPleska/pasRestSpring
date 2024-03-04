@@ -1,6 +1,5 @@
 package integrationTests;
 
-import com.example.passpringrest.codecs.MongoUUID;
 import com.example.passpringrest.dto.AuthenticationDto;
 import com.example.passpringrest.entities.ResourceManagerAccount;
 import com.example.passpringrest.entities.Room;
@@ -14,8 +13,9 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 
 import java.util.UUID;
 
@@ -23,24 +23,31 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
+
+@SpringBootTest(classes = com.example.passpringrest.PasSpringRestApplication.class)
 public class RoomControllerTest {
 
     private static Room room;
-    private static RoomRepository roomRepository;
 
-    private static final String baseUrl = "https://localhost:8080/api/rooms";
+    @Autowired
+    private RoomRepository roomRepository;
+
+    @Autowired
+    private AccountRepository accountRepository;
+
+    private static final String baseUrl = "http://localhost:8080/api/rooms";
 
     private static String jwtToken;
 
+
     @BeforeEach
     public void clearData() {
-        roomRepository = new RoomRepository();
-        roomRepository.dropRoomCollection();
-        AccountRepository accountRepository = new AccountRepository();
-        accountRepository.dropAccountCollection();
-        room = new Room(new MongoUUID(UUID.randomUUID()), 1, 2, 3);
-        ResourceManagerAccount resourceManagerAccount = new ResourceManagerAccount("login", new BCryptPasswordEncoder().encode("password"), "12345678901", true);
-        accountRepository.insertAccount(resourceManagerAccount);
+        roomRepository.deleteAll();
+        accountRepository.deleteAll();
+        room = new Room(UUID.randomUUID(), 1, 2, 3);
+        ResourceManagerAccount resourceManagerAccount = new ResourceManagerAccount("login", new BCryptPasswordEncoder().encode("password"),
+                "12345678901", true);
+        accountRepository.save(resourceManagerAccount);
         AuthenticationDto authenticationDto = new AuthenticationDto("login", "password");
         RestAssured.useRelaxedHTTPSValidation();
         ValidatableResponse response = given()
@@ -51,7 +58,7 @@ public class RoomControllerTest {
                 .then()
                 .statusCode(200);
         jwtToken = response.extract().body().asString();
-        roomRepository.insertRoom(room);
+        roomRepository.save(room);
     }
 
 
@@ -66,7 +73,7 @@ public class RoomControllerTest {
 
     @Test
     public void readRoomsNegativeTest() {
-        roomRepository.dropRoomCollection();
+        roomRepository.deleteAll();
         Response response = RestAssured.given().header("Authorization", "Bearer " + jwtToken).get(baseUrl);
         Assertions.assertEquals(404, response.getStatusCode());
     }
@@ -288,9 +295,9 @@ public class RoomControllerTest {
 
     @Test
     public void deleteRentedRoomNegativeTest() {
-        Room roomRented = new Room(new MongoUUID(UUID.randomUUID()), 50, 2, 3);
-        roomRented.setIsRented(1);
-        roomRepository.insertRoom(roomRented);
+        Room roomRented = new Room(UUID.randomUUID(), 50, 2, 3);
+        roomRented.setRented(true);
+        roomRepository.save(roomRented);
         Response response = RestAssured.given().header("Authorization", "Bearer " + jwtToken).delete(baseUrl + "/" + 50);
         Assertions.assertEquals(409, response.getStatusCode());
     }

@@ -1,7 +1,7 @@
 package com.example.passpringrest.security;
 
+import com.example.passpringrest.exceptions.ResourceNotFoundException;
 import com.example.passpringrest.repositories.AccountRepository;
-import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +24,7 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return accountRepository::readAccountByLogin;
+        return login -> accountRepository.findByLogin(login).orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Bean

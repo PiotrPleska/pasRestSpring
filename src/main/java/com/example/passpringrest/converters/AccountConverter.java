@@ -1,7 +1,6 @@
 package com.example.passpringrest.converters;
 
 
-import com.example.passpringrest.codecs.MongoUUID;
 import com.example.passpringrest.dto.AbstractAccountDto;
 import com.example.passpringrest.dto.AdminAccountDto;
 import com.example.passpringrest.dto.ClientAccountDto;
@@ -14,30 +13,30 @@ import com.example.passpringrest.entities.ResourceManagerAccount;
 public class AccountConverter {
 
     public static ClientAccountDto toClientDto(ClientAccount account) {
-        return new ClientAccountDto(account.getId().getUuid(), account.getLogin(), account.getPersonalId(), account.getActive());
+        return new ClientAccountDto(account.getId(), account.getLogin(), account.getPersonalId(), account.getActive());
     }
 
     public static ClientAccount toClient(ClientAccountDto account) {
-        return new ClientAccount(new MongoUUID(account.getId()), account.getLogin(), account.getPassword(), account.getPersonalId(),
+        return new ClientAccount(account.getId(), account.getLogin(), account.getPassword(), account.getPersonalId(),
                 account.getActive());
     }
 
     public static AdminAccountDto toAdminDto(AdminAccount account) {
-        return new AdminAccountDto(account.getId().getUuid(), account.getLogin(), account.getPersonalId(), account.getActive());
+        return new AdminAccountDto(account.getId(), account.getLogin(), account.getPersonalId(), account.getActive());
     }
 
     public static AdminAccount toAdmin(AdminAccountDto account) {
-        return new AdminAccount(new MongoUUID(account.getId()), account.getLogin(), account.getPassword(), account.getPersonalId(),
+        return new AdminAccount(account.getId(), account.getLogin(), account.getPassword(), account.getPersonalId(),
                 account.getActive());
     }
 
     public static ResourceManagerAccount toResourceManager(ResourceManagerAccountDto account) {
-        return new ResourceManagerAccount(new MongoUUID(account.getId()), account.getLogin(), account.getPassword(), account.getPersonalId(),
+        return new ResourceManagerAccount(account.getId(), account.getLogin(), account.getPassword(), account.getPersonalId(),
                 account.getActive());
     }
 
     public static ResourceManagerAccountDto toResourceManagerDto(ResourceManagerAccount account) {
-        return new ResourceManagerAccountDto(account.getId().getUuid(), account.getLogin(), account.getPersonalId(), account.getActive());
+        return new ResourceManagerAccountDto(account.getId(), account.getLogin(), account.getPersonalId(), account.getActive());
     }
 
     public static AbstractAccountDto solveAccountDtoType(AbstractAccount account) {

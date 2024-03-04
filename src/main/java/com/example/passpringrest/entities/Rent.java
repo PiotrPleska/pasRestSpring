@@ -1,88 +1,57 @@
 package com.example.passpringrest.entities;
 
-import com.example.passpringrest.codecs.MongoUUID;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonProperty;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.GregorianCalendar;
+import java.util.UUID;
+
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
 
 public class Rent {
 
-    @BsonProperty("_id")
-    private MongoUUID rentId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "rent_id", updatable = false, nullable = false)
+    private UUID rentId;
 
-    @BsonProperty("rentStartDate")
+    @Column(name = "rent_start_date", nullable = false)
     private GregorianCalendar rentStartDate;
 
-    @BsonProperty("rentEndDate")
+    @Column(name = "rent_end_date", nullable = false)
     private GregorianCalendar rentEndDate;
 
-    @BsonProperty("account")
-    private ClientAccount clientAccount;
+    @ManyToOne
+    @JoinColumn
+    private AbstractAccount clientAccount;
 
-    @BsonProperty("room")
+
+    @ManyToOne
+    @JoinColumn
     private Room room;
 
-    public void setClientAccount(ClientAccount clientAccount) {
-        this.clientAccount = clientAccount;
-    }
-
-    public Rent(MongoUUID uuid, GregorianCalendar rentStartDate, ClientAccount clientAccount, Room room) {
-        this.rentId = uuid;
+    public Rent(GregorianCalendar rentStartDate, ClientAccount account, Room room) {
         this.rentStartDate = rentStartDate;
-        this.clientAccount = clientAccount;
+        this.clientAccount = account;
         this.room = room;
     }
 
-    @BsonCreator
-    public Rent(@BsonProperty("_id") MongoUUID rentId, @BsonProperty("rentStartDate") GregorianCalendar rentStartDate,
-                @BsonProperty("rentEndDate") GregorianCalendar rentEndDate, @BsonProperty("account") ClientAccount clientAccount, @BsonProperty(
-                        "room") Room room) {
+    public Rent(UUID rentId, GregorianCalendar rentStartDate, ClientAccount client, Room entity) {
         this.rentId = rentId;
         this.rentStartDate = rentStartDate;
-        this.rentEndDate = rentEndDate;
-        this.clientAccount = clientAccount;
-        this.room = room;
+        this.clientAccount = client;
+        this.room = entity;
     }
 
-    public Rent() {
-    }
-
-    public MongoUUID getRentId() {
-        return rentId;
-    }
-
-    public void setRentId(MongoUUID rentId) {
-        this.rentId = rentId;
-    }
-
-    public GregorianCalendar getRentStartDate() {
-        return rentStartDate;
-    }
-
-    public void setRentStartDate(GregorianCalendar rentStartDate) {
-        this.rentStartDate = rentStartDate;
-    }
-
-    public GregorianCalendar getRentEndDate() {
-        return rentEndDate;
-    }
-
-    public void setRentEndDate(GregorianCalendar rentEndDate) {
-        this.rentEndDate = rentEndDate;
-    }
-
-    public ClientAccount getClientAccount() {
-        return clientAccount;
-    }
-
-    public Room getRoom() {
-        return room;
-    }
-
-    public void setRoom(Room room) {
-        this.room = room;
-    }
 
     public void endRent(GregorianCalendar endDate) {
         if (endDate.before(rentStartDate)) {

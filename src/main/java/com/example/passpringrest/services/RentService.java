@@ -1,6 +1,5 @@
 package com.example.passpringrest.services;
 
-import com.example.passpringrest.codecs.MongoUUID;
 import com.example.passpringrest.converters.RentConverter;
 import com.example.passpringrest.dto.RentDtoGet;
 import com.example.passpringrest.dto.RentDtoPost;
@@ -15,7 +14,6 @@ import com.example.passpringrest.repositories.RentRepository;
 import com.example.passpringrest.repositories.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -35,188 +33,127 @@ public class RentService {
     private final AccountRepository accountRepository;
 
     public List<RentDtoGet> readAllRents() throws ResourceNotFoundException {
-        try {
-            List<Rent> rents = rentRepository.readAllRents();
-            List<RentDtoGet> rentDtoGets = new ArrayList<>();
-            for (Rent rent : rents) {
-                rentDtoGets.add(RentConverter.toDto(rent));
-            }
-            if(rentDtoGets.isEmpty())
-                throw new ResourceNotFoundException("Rents not found");
-            return rentDtoGets;
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("Rents not found");
+        List<Rent> rents = rentRepository.findAll();
+        List<RentDtoGet> rentDtoGets = new ArrayList<>();
+        for (Rent rent : rents) {
+            rentDtoGets.add(RentConverter.toDto(rent));
         }
+        if (rentDtoGets.isEmpty())
+            throw new ResourceNotFoundException("Rents not found");
+        return rentDtoGets;
     }
 
     public List<RentDtoGet> readAllRentsByAccountId(String id) throws ResourceNotFoundException {
-        try {
-            List<Rent> rents = rentRepository.readRentsByAccountId(id);
-            List<RentDtoGet> rentDtoGets = new ArrayList<>();
-            for (Rent rent : rents) {
-                rentDtoGets.add(RentConverter.toDto(rent));
-            }
-            if(rentDtoGets.isEmpty())
-                throw new ResourceNotFoundException("Rents not found");
-            return rentDtoGets;
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("Rents not found");
+        List<Rent> rents = rentRepository.findByClientAccount_Id(UUID.fromString(id));
+        List<RentDtoGet> rentDtoGets = new ArrayList<>();
+        for (Rent rent : rents) {
+            rentDtoGets.add(RentConverter.toDto(rent));
         }
+        if (rentDtoGets.isEmpty())
+            throw new ResourceNotFoundException("Rents not found");
+        return rentDtoGets;
     }
 
     public List<RentDtoGet> readAllCurrentRentsByAccountId(String id) throws ResourceNotFoundException {
-        try {
-            List<Rent> rents = rentRepository.readAllCurrentRentsByAccountId(id);
-            List<RentDtoGet> rentDtoGets = new ArrayList<>();
-            for (Rent rent : rents) {
-                rentDtoGets.add(RentConverter.toDto(rent));
-            }
-            if(rentDtoGets.isEmpty())
-                throw new ResourceNotFoundException("Rents not found");
-            return rentDtoGets;
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("Rents not found");
+        List<Rent> rents = rentRepository.findCurrentRentsByClientId(id);
+        List<RentDtoGet> rentDtoGets = new ArrayList<>();
+        for (Rent rent : rents) {
+            rentDtoGets.add(RentConverter.toDto(rent));
         }
+        if (rentDtoGets.isEmpty())
+            throw new ResourceNotFoundException("Rents not found");
+        return rentDtoGets;
     }
 
     public List<RentDtoGet> readAllPastRentsByAccountId(String id) throws ResourceNotFoundException {
-        try {
-            List<Rent> rents = rentRepository.readAllPastRentsByAccountId(id);
-            List<RentDtoGet> rentDtoGets = new ArrayList<>();
-            for (Rent rent : rents) {
-                rentDtoGets.add(RentConverter.toDto(rent));
-            }
-            if(rentDtoGets.isEmpty())
-                throw new ResourceNotFoundException("Rents not found");
-            return rentDtoGets;
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("Rents not found");
+        List<Rent> rents = rentRepository.findPastRentsByClientId(id);
+        List<RentDtoGet> rentDtoGets = new ArrayList<>();
+        for (Rent rent : rents) {
+            rentDtoGets.add(RentConverter.toDto(rent));
         }
+        if (rentDtoGets.isEmpty())
+            throw new ResourceNotFoundException("Rents not found");
+        return rentDtoGets;
     }
 
     public List<RentDtoGet> readAllRentsByRoomId(String id) throws ResourceNotFoundException {
-        try {
-            List<Rent> rents = rentRepository.readRentsByRoomId(id);
-            List<RentDtoGet> rentDtoGets = new ArrayList<>();
-            for (Rent rent : rents) {
-                rentDtoGets.add(RentConverter.toDto(rent));
-            }
-            if(rentDtoGets.isEmpty())
-                throw new ResourceNotFoundException("Rents not found");
-            return rentDtoGets;
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("Rents not found");
+        List<Rent> rents = rentRepository.findAllByRoom_Id(UUID.fromString(id));
+        List<RentDtoGet> rentDtoGets = new ArrayList<>();
+        for (Rent rent : rents) {
+            rentDtoGets.add(RentConverter.toDto(rent));
         }
+        if (rentDtoGets.isEmpty())
+            throw new ResourceNotFoundException("Rents not found");
+        return rentDtoGets;
     }
 
     public List<RentDtoGet> readAllCurrentRents() throws ResourceNotFoundException {
-        try {
-            List<Rent> rents = rentRepository.readAllCurrentRents();
-            List<RentDtoGet> rentDtoGets = new ArrayList<>();
-            for (Rent rent : rents) {
-                rentDtoGets.add(RentConverter.toDto(rent));
-            }
-            if(rentDtoGets.isEmpty())
-                throw new ResourceNotFoundException("Rents not found");
-            return rentDtoGets;
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("Rents not found");
+        List<Rent> rents = rentRepository.findByRentEndDateIsNull();
+        List<RentDtoGet> rentDtoGets = new ArrayList<>();
+        for (Rent rent : rents) {
+            rentDtoGets.add(RentConverter.toDto(rent));
         }
+        if (rentDtoGets.isEmpty())
+            throw new ResourceNotFoundException("Rents not found");
+        return rentDtoGets;
     }
 
     public List<RentDtoGet> readAllPastRents() throws ResourceNotFoundException {
-        try {
-            List<Rent> rents = rentRepository.readAllPastRents();
-            List<RentDtoGet> rentDtoGets = new ArrayList<>();
-            for (Rent rent : rents) {
-                rentDtoGets.add(RentConverter.toDto(rent));
-            }
-            if(rentDtoGets.isEmpty())
-                throw new ResourceNotFoundException("Rents not found");
-            return rentDtoGets;
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("Rents not found");
+        List<Rent> rents = rentRepository.findByRentEndDateIsNotNull();
+        List<RentDtoGet> rentDtoGets = new ArrayList<>();
+        for (Rent rent : rents) {
+            rentDtoGets.add(RentConverter.toDto(rent));
         }
+        if (rentDtoGets.isEmpty())
+            throw new ResourceNotFoundException("Rents not found");
+        return rentDtoGets;
     }
 
     public List<RentDtoGet> readAllCurrentRentsByRoomId(String id) throws ResourceNotFoundException {
-        try {
-            List<Rent> rents = rentRepository.readAllCurrentRentsByRoomId(id);
-            List<RentDtoGet> rentDtoGets = new ArrayList<>();
-            for (Rent rent : rents) {
-                rentDtoGets.add(RentConverter.toDto(rent));
-            }
-            if(rentDtoGets.isEmpty())
-                throw new ResourceNotFoundException("Rents not found");
-            return rentDtoGets;
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("Rents not found");
+        List<Rent> rents = rentRepository.findCurrentRentsByRoomId(id);
+        List<RentDtoGet> rentDtoGets = new ArrayList<>();
+        for (Rent rent : rents) {
+            rentDtoGets.add(RentConverter.toDto(rent));
         }
+        if (rentDtoGets.isEmpty())
+            throw new ResourceNotFoundException("Rents not found");
+        return rentDtoGets;
     }
 
     public List<RentDtoGet> readAllPastRentsByRoomId(String id) throws ResourceNotFoundException {
-        try {
-            List<Rent> rents = rentRepository.readAllPastRentsByRoomId(id);
-            List<RentDtoGet> rentDtoGets = new ArrayList<>();
-            for (Rent rent : rents) {
-                rentDtoGets.add(RentConverter.toDto(rent));
-            }
-            if(rentDtoGets.isEmpty())
-                throw new ResourceNotFoundException("Rents not found");
-            return rentDtoGets;
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("Rents not found");
+        List<Rent> rents = rentRepository.findPastRentsByRoomId(id);
+        List<RentDtoGet> rentDtoGets = new ArrayList<>();
+        for (Rent rent : rents) {
+            rentDtoGets.add(RentConverter.toDto(rent));
         }
+        if (rentDtoGets.isEmpty())
+            throw new ResourceNotFoundException("Rents not found");
+        return rentDtoGets;
     }
 
     public RentDtoGet readRentById(String id) throws ResourceNotFoundException {
-        try {
-            return RentConverter.toDto(rentRepository.readRentById(new MongoUUID(UUID.fromString(id))));
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("Rent not found");
-        }
+        return RentConverter.toDto(rentRepository.findById(UUID.fromString(id)).orElseThrow(() -> new ResourceNotFoundException("Rent with given id" +
+                " not found")));
     }
 
     public void deleteRent(String id) throws ResourceNotFoundException, ResourceOccupiedException {
-        Rent rent = rentRepository.readRentById(new MongoUUID(UUID.fromString(id)));
-        if (rent == null) {
-            throw new ResourceNotFoundException("Rent does not exist");
-        }
+        Rent rent = rentRepository.findById(UUID.fromString(id)).orElseThrow(() -> new ResourceNotFoundException("Rent with given id not found"));
         if (rent.getRentEndDate() != null) {
             throw new ResourceOccupiedException("Rent is already finished");
         }
-        rentRepository.deleteRent(rent);
-    }
-
-    // TODO do zmiany
-    public void updateEndRentDate(String id) throws ResourceNotFoundException, ResourceOccupiedException {
-        Rent rent = rentRepository.readRentById(new MongoUUID(UUID.fromString(id)));
-        if (rent == null) {
-            throw new ResourceNotFoundException("Rent does not exist");
-        }
-        if (rent.getRentEndDate() != null) {
-            throw new ResourceOccupiedException("Rent is already finished");
-        }
-        GregorianCalendar now = new GregorianCalendar();
-        MongoUUID uuid = new MongoUUID(UUID.fromString(id));
-        rentRepository.updateEndRentDate(uuid, now);
+        rent.setRentEndDate(new GregorianCalendar());
+        rentRepository.save(rent);
     }
 
     public RentDtoGet createRent(RentDtoPost rentDtoPost) throws ResourceNotFoundException {
-        AbstractAccount account = accountRepository.readAccountById(new MongoUUID(UUID.fromString(rentDtoPost.getAccountId())));
-        Room room = roomRepository.readRoomById(new MongoUUID(UUID.fromString(rentDtoPost.getRoomId())));
-        if (account == null) {
-            throw new ResourceNotFoundException("Account does not exist");
-        }
-
-        if (room == null) {
-            throw new ResourceNotFoundException("Room does not exist");
-        }
-
-        Rent rent = new Rent(new MongoUUID(UUID.randomUUID()), rentDtoPost.getRentStartDate(), (ClientAccount) account, room);
-        RentDtoGet rentDtoGet = RentConverter.toDto(rent);
-        rentRepository.insertRent(rent);
-        return rentDtoGet;
+        AbstractAccount account =
+                accountRepository.findById(UUID.fromString(rentDtoPost.getAccountId())).orElseThrow(() -> new ResourceNotFoundException("Account " +
+                        "does not exist"));
+        Room room = roomRepository.findById(UUID.fromString(rentDtoPost.getRoomId())).orElseThrow(() -> new ResourceNotFoundException("Room does " +
+                "not exist"));
+        Rent rent = new Rent(rentDtoPost.getRentStartDate(), (ClientAccount) account, room);
+        rentRepository.save(rent);
+        return RentConverter.toDto(rent);
     }
 
 }
